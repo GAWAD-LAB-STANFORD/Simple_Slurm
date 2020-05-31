@@ -89,6 +89,9 @@ if [ $PROGRAM = "scope_cnv" ]; then
     fi
     if [ ! -z $RESULTS_DIR ]; then
         OPTIONS+=( "--results_dir $RESULTS_DIR" )
+        if [ ! -d $RESULTS_DIR ]; then
+            mkdir $RESULTS_DIR
+        fi
     else
         RESULTS_DIR=$BAM_DIR
     fi
@@ -120,6 +123,9 @@ elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ]; then
     fi
     if [ ! -z $RESULTS_DIR ]; then
         OPTIONS+=( "--results_dir $RESULTS_DIR" )
+        if [ ! -d $RESULTS_DIR ]; then
+            mkdir $RESULTS_DIR
+        fi
     else
         RESULTS_DIR=$BAM_DIR
     fi
