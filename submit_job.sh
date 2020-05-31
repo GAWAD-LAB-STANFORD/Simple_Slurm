@@ -89,14 +89,14 @@ if [ $PROGRAM = "scope_cnv" ]; then
     fi
     if [ ! -z $RESULTS_DIR ]; then
         OPTIONS+=( "--results_dir $RESULTS_DIR" )
-        if [ ! -d $RESULTS_DIR ]; then
-            mkdir $RESULTS_DIR
-        fi
     else
         RESULTS_DIR=$BAM_DIR
     fi
     if [ -z $STD_ERR_OUT_DIR ]; then
         STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
+    fi
+    if [ ! -d $RESULTS_DIR ]; then
+        mkdir $RESULTS_DIR
     fi
     if [ ! -d $STD_ERR_OUT_DIR ]; then
         mkdir $STD_ERR_OUT_DIR
@@ -131,6 +131,9 @@ elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ]; then
     fi
     if [ -z $STD_ERR_OUT_DIR ]; then
         STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
+    fi
+    if [ ! -d $RESULTS_DIR ]; then
+        mkdir $RESULTS_DIR
     fi
     if [ ! -d $STD_ERR_OUT_DIR ]; then
         mkdir $STD_ERR_OUT_DIR
