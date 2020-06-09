@@ -73,7 +73,6 @@ bash scripts/analyze.sh $WORK_DIR
 for SAMPLE in ${SAMPLE_ARRAY[@]}; do
     rm ${FULL_WORK_DIR}/${SAMPLE}.bed.gz
 done
-rm ${FULL_WORK_DIR}/list ${FULL_WORK_DIR}/config
 
 mv ${FULL_WORK_DIR}/* ${RESULTS_DIR}/
 
