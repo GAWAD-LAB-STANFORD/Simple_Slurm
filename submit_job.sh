@@ -16,7 +16,7 @@ Conserting SC CNV analysis: \n\t\
         sh ${PIPELINE_DIR}/submit_job.sh --conserting_sc_cnv --bam_dir /path/to/BAMs/ \n\n\
 Ginkgo CNV analysis: \n\t\
     Required: -b/--bam_dir <arg> \n\t\
-    Optional: --results_dir <arg> (default bam_dir), --kb_bin_size <arg> (default 500), --bam_regex <arg> (default .*.bam), --bam_suffix <arg> (default .bam) \n\t\
+    Optional: --results_dir <arg> (default bam_dir), --kb_bin_size <arg> (default 500), --bam_regex <arg> (default .*.bam), --bam_suffix <arg> (default .bam) --group_segmentation \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --ginkgo_cnv --bam_dir /path/to/BAMs/ \n\n\
 Demultiplexer: \n\t\
@@ -27,6 +27,7 @@ Demultiplexer: \n\t\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
+GROUP_SEGMENTATION=0
 GENOME_VERSION="hg38"
 PROGRAM="none"
 while [ "$1" != "" ]; do
@@ -73,6 +74,8 @@ while [ "$1" != "" ]; do
                                 ;;
         --bam_suffix )          shift
                                 BAM_SUFFIX=$1
+                                ;;
+        --group_segmentation )  GROUP_SEGMENTATION=1
                                 ;;
         --slurm )               shift
                                 SLURM_OPTIONS=${@:1}
@@ -163,6 +166,9 @@ elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ]; then
         sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
             --array=1-$NUM_SAMPLES ${PIPELINE_DIR}/scripts/conserting_sc_cnv.sh --bam_dir $BAM_DIR ${OPTIONS[@]}
     else
+        if [ $GROUP_SEGMENTATION -eq 1 ]; then
+            OPTIONS+=( "--group_segmentation" )
+        fi
         REFERENCE_DIR="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/ginkgo/genomes/hg38"
         if [ ! -f "${REFERENCE_DIR}/variable_${KB_BIN_SIZE}000_76_bwa" ]; then
             echo "The reference files for that kb bin size have not been created. Exiting with code 1"

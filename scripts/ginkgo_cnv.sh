@@ -13,24 +13,27 @@ WORK_DIR="$(basename $FULL_WORK_DIR)"
 BAM_REGEX=".*.bam"
 BAM_SUFFIX=".bam"
 KB_BIN_SIZE="500"
+GROUP_SEGMENTATION=0
 
 while [ "$1" != "" ]; do
     case $1 in
-        --bam_dir )         shift
-                            BAM_DIR=$1
-                            ;;
-        --bam_regex )       shift
-                            BAM_REGEX=$1
-                            ;;
-        --bam_suffix )      shift
-                            BAM_SUFFIX=$1
-                            ;;
-        --kb_bin_size )     shift
-                            KB_BIN_SIZE=$1
-                            ;;
-        --results_dir )     shift
-                            RESULTS_DIR=$1
-                            ;;
+        --bam_dir )             shift
+                                BAM_DIR=$1
+                                ;;
+        --bam_regex )           shift
+                                BAM_REGEX=$1
+                                ;;
+        --bam_suffix )          shift
+                                BAM_SUFFIX=$1
+                                ;;
+        --kb_bin_size )         shift
+                                KB_BIN_SIZE=$1
+                                ;;
+        --results_dir )         shift
+                                RESULTS_DIR=$1
+                                ;;
+        --group_segmentation )  GROUP_SEGMENTATION=1
+                                ;;
     esac
     shift
 done
@@ -62,6 +65,9 @@ done
 
 cp ${GINKGO_DIR}/config.txt ${FULL_WORK_DIR}/config
 sed -i "s/variable_500000_76_bwa/variable_${KB_BIN_SIZE}000_76_bwa/" ${FULL_WORK_DIR}/config
+if [ $GROUP_SEGMENTATION -eq 1 ]; then
+    sed -i "s/segMeth=0/segMeth=1/" ${FULL_WORK_DIR}/config
+fi
 bash scripts/analyze.sh $WORK_DIR
 
 for SAMPLE in ${SAMPLE_ARRAY[@]}; do
