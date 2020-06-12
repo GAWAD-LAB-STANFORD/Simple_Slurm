@@ -24,12 +24,18 @@ Demultiplexer: \n\t\
     Optional: --sample_sheet <arg> (default SampleSheet.csv), -p/--project <arg> \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --demultiplex --fastq_dir /path/to/fastq/ --run_dir /path/to/runfolder/ \n\n\
+VAF filter: \n\t\
+    Required: --input_vcf <arg> and --output_tsv <arg> \n\t\
+    Optional: --input_blacklist <arg>, --output_blacklist <arg>, --combine_blacklists, --af_max (default 0.1), --dp_min (default 5), --mq_min (default 30) \n\t\
+    Run like: \n\t\t\
+        sh ${PIPELINE_DIR}/submit_job.sh --vaf_filter --input_vcf /path/to/unfiltered_variants.vcf --output_tsv /path/to/filtered_variants.tsv \n\n\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
 GROUP_SEGMENTATION=0
 GENOME_VERSION="hg38"
 PROGRAM="none"
+COMBINE_BLACKLISTS=0
 while [ "$1" != "" ]; do
     case $1 in
         -h | --help )           echo -e $HELP
@@ -42,6 +48,8 @@ while [ "$1" != "" ]; do
         --ginkgo_cnv )          PROGRAM="ginkgo_cnv"
                                 ;;
         --demultiplex )         PROGRAM="demultiplex"
+                                ;;
+        --vaf_filter )           PROGRAM="VAF_filter"
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
@@ -76,6 +84,29 @@ while [ "$1" != "" ]; do
                                 BAM_SUFFIX=$1
                                 ;;
         --group_segmentation )  GROUP_SEGMENTATION=1
+                                ;;
+        --input_vcf )           shift
+                                INPUT_VCF=$1
+                                ;;
+        --output_tsv )          shift
+                                OUTPUT_TSV=$1
+                                ;;
+        --input_blacklist )     shift
+                                INPUT_BLACKLIST=$1
+                                ;;
+        --output_blacklist )    shift
+                                OUTPUT_BLACKLIST=$1
+                                ;;
+        --combine_blacklists )  COMBINE_BLACKLISTS=1
+                                ;;
+        --vaf_max )             shift
+                                VAF_MAX=$1
+                                ;;
+        --dp_min )              shift
+                                DP_MIN=$1
+                                ;;
+        --mq_min )              shift
+                                MQ_MIN=$1
                                 ;;
         --slurm )               shift
                                 SLURM_OPTIONS=${@:1}
@@ -198,6 +229,45 @@ elif [ $PROGRAM = "demultiplex" ]; then
         ${PIPELINE_DIR}/scripts/demultiplexer.sh \
         --run_dir $RUN_DIR --sample_sheet $SAMPLE_SHEET --fastq_dir $FASTQ_DIR \
         --project $PROJECT --script_dir ${PIPELINE_DIR}/scripts
+elif [ $PROGRAM = "VAF_filter" ]; then
+    if [ -z $INPUT_VCF ] || [ ! -f $INPUT_VCF ] || [ -z $OUTPUT_TSV ]; then
+        echo "Variables not supplied correctly or input VCF doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
+        exit 1
+    fi
+    if [ ! -z $INPUT_BLACKLIST ]; then
+        if [ ! -f $INPUT_BLACKLIST ]; then
+            echo "Input blacklist specified but doesn't exist. Exiting with code 1"
+            exit 1
+        fi
+    fi
+    RESULTS_DIR=$(dirname $OUTPUT_TSV)
+    if [ -z $STD_ERR_OUT_DIR ]; then
+        STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
+    fi
+    if [ ! -d $STD_ERR_OUT_DIR ]; then
+        mkdir $STD_ERR_OUT_DIR
+    fi
+    if [ ! -z $INPUT_BLACKLIST ]; then
+        OPTIONS+=( "--input_blacklist $INPUT_BLACKLIST" )
+    fi
+    if [ ! -z $OUTPUT_BLACKLIST ]; then
+        OPTIONS+=( "--output_blacklist $OUTPUT_BLACKLIST" )
+    fi
+    if [ $COMBINE_BLACKLISTS -eq 1 ]; then
+        OPTIONS+=( "--combine_blacklists" )
+    fi
+    if [ $VAF_MAX -eq 1 ]; then
+        OPTIONS+=( "--af_max $VAF_MAX" )
+    fi
+    if [ $DP_MIN -eq 1 ]; then
+        OPTIONS+=( "--dp_min $DP_MIN" )
+    fi
+    if [ $MQ_MIN -eq 1 ]; then
+        OPTIONS+=( "--mq_min $MQ_MIN" )
+    fi
+    sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
+        ${PIPELINE_DIR}/scripts/VAF_filter.sh \
+        --script_dir ${PIPELINE_DIR}/scripts --input_vcf $INPUT_VCF --output_tsv $OUTPUT_TSV ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0
