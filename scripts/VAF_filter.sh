@@ -58,7 +58,7 @@ if [ $COMBINE_BLACKLISTS -eq 1 ]; then
     OPTIONS+=( "--combine_blacklists" )
 fi
 if [ $VAF_MAX -eq 1 ]; then
-    OPTIONS+=( "--af_max $VAF_MAX" )
+    OPTIONS+=( "--vaf_max $VAF_MAX" )
 fi
 if [ $DP_MIN -eq 1 ]; then
     OPTIONS+=( "--dp_min $DP_MIN" )

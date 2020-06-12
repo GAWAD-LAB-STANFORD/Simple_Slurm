@@ -26,7 +26,7 @@ Demultiplexer: \n\t\
         sh ${PIPELINE_DIR}/submit_job.sh --demultiplex --fastq_dir /path/to/fastq/ --run_dir /path/to/runfolder/ \n\n\
 VAF filter: \n\t\
     Required: --input_vcf <arg> and --output_tsv <arg> \n\t\
-    Optional: --input_blacklist <arg>, --output_blacklist <arg>, --combine_blacklists, --af_max (default 0.1), --dp_min (default 5), --mq_min (default 30) \n\t\
+    Optional: --input_blacklist <arg>, --output_blacklist <arg>, --combine_blacklists, --vaf_max (default 0.1), --dp_min (default 5), --mq_min (default 30) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --vaf_filter --input_vcf /path/to/unfiltered_variants.vcf --output_tsv /path/to/filtered_variants.tsv \n\n\
 For more information, read the README.md"
@@ -257,7 +257,7 @@ elif [ $PROGRAM = "VAF_filter" ]; then
         OPTIONS+=( "--combine_blacklists" )
     fi
     if [ $VAF_MAX -eq 1 ]; then
-        OPTIONS+=( "--af_max $VAF_MAX" )
+        OPTIONS+=( "--vaf_max $VAF_MAX" )
     fi
     if [ $DP_MIN -eq 1 ]; then
         OPTIONS+=( "--dp_min $DP_MIN" )
