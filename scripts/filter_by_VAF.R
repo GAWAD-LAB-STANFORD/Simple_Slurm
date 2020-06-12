@@ -1,8 +1,5 @@
 #!/usr/bin/env Rscript
-suppressPackageStartupMessages({
-  library(tidyverse)
-  library(optparse)
-})
+library(optparse)
 
 option_list = list(
   make_option(c("-i", "--input_tsv"), type="character", default=NULL,
@@ -31,8 +28,12 @@ if (is.null(opt$input_tsv) || is.null(opt$output_tsv)) {
   stop("You must specify --input_tsv and --output_tsv. Use -h or --help to get the help message.")
 }
 
+suppressPackageStartupMessages({
+  library(tidyverse)
+})
+
 main <- function() {
-  blacklist_columns <- c("CHROM", "POS", "REF", "ALT", "MQ", "DP", "cohort_AF")
+  blacklist_columns <- c("CHROM", "POS", "REF", "ALT", "MQ", "DP", "cohort_VAF")
   if (!is.null(opt$input_blacklist) & !opt$combine_blacklists) {
     cat("Input blacklist provided. The program will use the provided blacklist for filtering and not generate a new blacklist\n")
     provided_blacklist_df <- read_tsv(opt$input_blacklist)
@@ -42,6 +43,8 @@ main <- function() {
     provided_blacklist_df <- read_tsv(opt$input_blacklist)
     new_blacklist_df <- generate_blacklist(blacklist_columns)
     combined_blacklist_df <- rbind(provided_blacklist_df[,blacklist_columns], new_blacklist_df[,blacklist_columns])
+    combined_blacklist_df <- combined_blacklist_df %>%
+      distinct(CHROM, POS, REF, ALT, .keep_all = TRUE)
     filter_with_blacklist(combined_blacklist_df)
     if (!is.null(opt$output_blacklist)) {
       write_tsv(combined_blacklist_df, opt$output_blacklist)
@@ -52,7 +55,7 @@ main <- function() {
     new_blacklist_df <- generate_blacklist(blacklist_columns)
     filter_with_blacklist(new_blacklist_df)
     if (!is.null(opt$output_blacklist)) {
-      write_tsv(combined_blacklist_df, opt$output_blacklist)
+      write_tsv(new_blacklist_df, opt$output_blacklist)
       cat("New blacklist outputted\n")
     }
   }
@@ -64,9 +67,9 @@ generate_blacklist <- function(columns_to_keep) {
   
   new_blacklist_df <- unfiltered_variants_df %>%
     group_by(CHROM, POS, REF, ALT) %>%
-      mutate(cohort_AF = n()/total_samples) %>%
+      mutate(cohort_VAF = n()/total_samples) %>%
     ungroup() %>%
-    filter(cohort_AF >= opt$vaf_max & DP_1 >= opt$dp_min & MQ >= opt$mq_min) %>%
+    filter(cohort_VAF >= opt$vaf_max & DP_1 >= opt$dp_min & MQ >= opt$mq_min) %>%
     distinct(CHROM, POS, REF, ALT, .keep_all = TRUE) %>%
     select(all_of(columns_to_keep))
   return(new_blacklist_df)
@@ -78,7 +81,7 @@ filter_with_blacklist <- function(blacklist_df) {
   filtered_variants_df <- anti_join(unfiltered_variants_df, blacklist_df)
   cat("Variants filtered with blacklist\n")
   
-  write(filtered_variants_df, opt$output_tsv)
+  write_tsv(filtered_variants_df, opt$output_tsv)
   cat("Filtered variants outputted\n")
 }
 
