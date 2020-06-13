@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#SBATCH --job-name=frequency_filter
+#SBATCH --job-name=VAF_filter
 #SBATCH --mem=32GB
 #SBATCH --cpus-per-task=2
 #SBATCH --time=10:00:00

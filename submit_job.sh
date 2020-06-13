@@ -253,16 +253,16 @@ elif [ $PROGRAM = "VAF_filter" ]; then
     if [ ! -z $OUTPUT_BLACKLIST ]; then
         OPTIONS+=( "--output_blacklist $OUTPUT_BLACKLIST" )
     fi
-    if [ $COMBINE_BLACKLISTS -eq 1 ]; then
+    if [ ! -z $COMBINE_BLACKLISTS ]; then
         OPTIONS+=( "--combine_blacklists" )
     fi
-    if [ $VAF_MAX -eq 1 ]; then
+    if [ ! -z $VAF_MAX ]; then
         OPTIONS+=( "--vaf_max $VAF_MAX" )
     fi
-    if [ $DP_MIN -eq 1 ]; then
+    if [ ! -z $DP_MIN ]; then
         OPTIONS+=( "--dp_min $DP_MIN" )
     fi
-    if [ $MQ_MIN -eq 1 ]; then
+    if [ ! -z $MQ_MIN ]; then
         OPTIONS+=( "--mq_min $MQ_MIN" )
     fi
     sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
