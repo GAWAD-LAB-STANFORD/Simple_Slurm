@@ -25,14 +25,14 @@ while [ "$1" != "" ]; do
                                 ;;
         --combine_blacklists )  COMBINE_BLACKLISTS=1
                                 ;;
-        --vaf_max )             shift
-                                VAF_MAX=$1
+        --vaf )                 shift
+                                VAF=$1
                                 ;;
-        --dp_min )              shift
-                                DP_MIN=$1
+        --dp )                  shift
+                                DP=$1
                                 ;;
-        --mq_min )              shift
-                                MQ_MIN=$1
+        --mq )                  shift
+                                MQ=$1
                                 ;;
         --script_dir )          shift
                                 SCRIPT_DIR=$1
@@ -57,14 +57,14 @@ fi
 if [ $COMBINE_BLACKLISTS -eq 1 ]; then
     OPTIONS+=( "--combine_blacklists" )
 fi
-if [ $VAF_MAX -eq 1 ]; then
-    OPTIONS+=( "--vaf_max $VAF_MAX" )
+if [ ! -z $VAF ]; then
+    OPTIONS+=( "--vaf $VAF" )
 fi
-if [ $DP_MIN -eq 1 ]; then
-    OPTIONS+=( "--dp_min $DP_MIN" )
+if [ ! -z $DP ]; then
+    OPTIONS+=( "--dp $DP" )
 fi
-if [ $MQ_MIN -eq 1 ]; then
-    OPTIONS+=( "--mq_min $MQ_MIN" )
+if [ ! -z $MQ ]; then
+    OPTIONS+=( "--mq $MQ" )
 fi
 
 ml R/3.6.1 python/3.6.1

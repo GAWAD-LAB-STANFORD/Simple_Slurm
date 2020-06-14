@@ -26,7 +26,7 @@ Demultiplexer: \n\t\
         sh ${PIPELINE_DIR}/submit_job.sh --demultiplex --fastq_dir /path/to/fastq/ --run_dir /path/to/runfolder/ \n\n\
 VAF filter: \n\t\
     Required: --input_vcf <arg> and --output_tsv <arg> \n\t\
-    Optional: --input_blacklist <arg>, --output_blacklist <arg>, --combine_blacklists, --vaf_max (default 0.1), --dp_min (default 5), --mq_min (default 30) \n\t\
+    Optional: --input_blacklist <arg>, --output_blacklist <arg>, --combine_blacklists, --vaf (default 0.1), --dp (default 5), --mq (default 30) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --vaf_filter --input_vcf /path/to/unfiltered_variants.vcf --output_tsv /path/to/filtered_variants.tsv \n\n\
 For more information, read the README.md"
@@ -99,14 +99,14 @@ while [ "$1" != "" ]; do
                                 ;;
         --combine_blacklists )  COMBINE_BLACKLISTS=1
                                 ;;
-        --vaf_max )             shift
-                                VAF_MAX=$1
+        --vaf )                 shift
+                                VAF=$1
                                 ;;
-        --dp_min )              shift
-                                DP_MIN=$1
+        --dp )                  shift
+                                DP=$1
                                 ;;
-        --mq_min )              shift
-                                MQ_MIN=$1
+        --mq )                  shift
+                                MQ=$1
                                 ;;
         --slurm )               shift
                                 SLURM_OPTIONS=${@:1}
@@ -256,14 +256,14 @@ elif [ $PROGRAM = "VAF_filter" ]; then
     if [ ! -z $COMBINE_BLACKLISTS ]; then
         OPTIONS+=( "--combine_blacklists" )
     fi
-    if [ ! -z $VAF_MAX ]; then
-        OPTIONS+=( "--vaf_max $VAF_MAX" )
+    if [ ! -z $VAF ]; then
+        OPTIONS+=( "--vaf $VAF" )
     fi
-    if [ ! -z $DP_MIN ]; then
-        OPTIONS+=( "--dp_min $DP_MIN" )
+    if [ ! -z $DP ]; then
+        OPTIONS+=( "--dp $DP" )
     fi
-    if [ ! -z $MQ_MIN ]; then
-        OPTIONS+=( "--mq_min $MQ_MIN" )
+    if [ ! -z $MQ ]; then
+        OPTIONS+=( "--mq $MQ" )
     fi
     sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
         ${PIPELINE_DIR}/scripts/VAF_filter.sh \
