@@ -205,7 +205,7 @@ elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ]; then
             echo "The reference files for that kb bin size have not been created. Exiting with code 1"
             exit 1
         fi
-        sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
+        sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
             ${PIPELINE_DIR}/scripts/ginkgo_cnv.sh --bam_dir $BAM_DIR ${OPTIONS[@]}
     fi
 elif [ $PROGRAM = "demultiplex" ]; then

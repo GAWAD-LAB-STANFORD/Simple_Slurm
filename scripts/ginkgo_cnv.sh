@@ -55,10 +55,8 @@ cd $GINKGO_DIR
 > ${FULL_WORK_DIR}/list
 for SAMPLE in ${SAMPLE_ARRAY[@]}; do
     echo "Preparing $SAMPLE"
-    cp ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} ${FULL_WORK_DIR}/
-    bedtools bamtobed -i ${FULL_WORK_DIR}/${SAMPLE}${BAM_SUFFIX} > ${FULL_WORK_DIR}/${SAMPLE}.bed
+    bedtools bamtobed -i ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} > ${FULL_WORK_DIR}/${SAMPLE}.bed
     gzip ${FULL_WORK_DIR}/${SAMPLE}.bed
-    rm ${FULL_WORK_DIR}/${SAMPLE}${BAM_SUFFIX}
     echo "${SAMPLE}.bed.gz" >> ${FULL_WORK_DIR}/list
     echo "Done preparing $SAMPLE"
 done
