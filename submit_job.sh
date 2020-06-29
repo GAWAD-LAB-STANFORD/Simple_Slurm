@@ -29,6 +29,11 @@ VAF filter: \n\t\
     Optional: --input_blacklist <arg>, --output_blacklist <arg>, --combine_blacklists, --vaf (default 0.1), --dp (default 5), --mq (default 30) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --vaf_filter --input_vcf /path/to/unfiltered_variants.vcf --output_tsv /path/to/filtered_variants.tsv \n\n\
+Monovar variant caller: \n\t\
+    Required: -b/--bam_dir <arg>, -p/--project <arg> \n\t\
+    Optional: --results_dir <arg> (default bam_dir), --bam_suffix <arg> (default .bam) \n\t\
+    Run like: \n\t\t\
+        sh ${PIPELINE_DIR}/submit_job.sh --monovar --project Monovar --bam_dir /path/to/BAMs/ \n\n\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
@@ -49,7 +54,9 @@ while [ "$1" != "" ]; do
                                 ;;
         --demultiplex )         PROGRAM="demultiplex"
                                 ;;
-        --vaf_filter )           PROGRAM="VAF_filter"
+        --vaf_filter )          PROGRAM="VAF_filter"
+                                ;;
+        --monovar )             PROGRAM="monovar"
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
@@ -268,6 +275,39 @@ elif [ $PROGRAM = "VAF_filter" ]; then
     sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
         ${PIPELINE_DIR}/scripts/VAF_filter.sh \
         --script_dir ${PIPELINE_DIR}/scripts --input_vcf $INPUT_VCF --output_tsv $OUTPUT_TSV ${OPTIONS[@]}
+elif [ $PROGRAM = "monovar" ]; then
+    if [ -z $PROJECT ] || [ -z $BAM_DIR ] || [ ! -d $BAM_DIR ] || [ -z $PIPELINE_DIR ]; then
+        echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
+        exit 1
+    fi
+    if [ ! -z $RESULTS_DIR ]; then
+        OPTIONS+=( "--results_dir $RESULTS_DIR" )
+        if [ ! -d $RESULTS_DIR ]; then
+            mkdir $RESULTS_DIR
+        fi
+    else
+        RESULTS_DIR=$BAM_DIR
+    fi
+    if [ -z $STD_ERR_OUT_DIR ]; then
+        STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
+    fi
+    if [ ! -d $RESULTS_DIR ]; then
+        mkdir $RESULTS_DIR
+    fi
+    if [ ! -d $STD_ERR_OUT_DIR ]; then
+        mkdir $STD_ERR_OUT_DIR
+    fi
+    if [ ! -z $BAM_SUFFIX ]; then
+        OPTIONS+=( "--bam_suffix $BAM_SUFFIX" )
+    else BAM_SUFFIX=".bam"
+    fi
+    NUM_SAMPLES=$(find ${BAM_DIR}/ -maxdepth 1 -name "*${BAM_SUFFIX}" | wc -l)
+    if [ $NUM_SAMPLES -eq 0 ]; then
+        echo "No BAM files found in the bam directory. Exiting with code 1"
+        exit 1
+    fi
+    sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
+        ${PIPELINE_DIR}/scripts/monovar.sh --project $PROJECT --bam_dir $BAM_DIR ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0

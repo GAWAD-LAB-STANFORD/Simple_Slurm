@@ -31,3 +31,4 @@
             - Desired_Cluster_Density column with at least one entry
             - Initial_Concentration column with as many entries as samples
     - Variant Allele Frequency filter
+    - Monovar Variant Caller
