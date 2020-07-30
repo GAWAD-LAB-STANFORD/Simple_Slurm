@@ -14,6 +14,7 @@ BAM_REGEX=".*.bam"
 BAM_SUFFIX=".bam"
 KB_BIN_SIZE="500"
 GROUP_SEGMENTATION=0
+GENOME_VERSION="hg38"
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -33,6 +34,10 @@ while [ "$1" != "" ]; do
                                 RESULTS_DIR=$1
                                 ;;
         --group_segmentation )  GROUP_SEGMENTATION=1
+                                ;;
+        --hg19 )                GENOME_VERSION="hg19"
+                                ;;
+        --b37 )                 GENOME_VERSION="b37"
                                 ;;
     esac
     shift
@@ -65,6 +70,11 @@ cp ${GINKGO_DIR}/config.txt ${FULL_WORK_DIR}/config
 sed -i "s/variable_500000_76_bwa/variable_${KB_BIN_SIZE}000_76_bwa/" ${FULL_WORK_DIR}/config
 if [ $GROUP_SEGMENTATION -eq 1 ]; then
     sed -i "s/segMeth=0/segMeth=1/" ${FULL_WORK_DIR}/config
+fi
+if [ $GENOME_VERSION = "hg19" ]; then
+    sed -i "s/chosen_genome=hg38/chosen_genome=hg19/" ${FULL_WORK_DIR}/config
+elif [ $GENOME_VERSION = "b37" ]; then
+    sed -i "s/chosen_genome=hg38/chosen_genome=b37/" ${FULL_WORK_DIR}/config
 fi
 bash scripts/analyze.sh $WORK_DIR
 

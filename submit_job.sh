@@ -16,7 +16,7 @@ Conserting SC CNV analysis: \n\t\
         sh ${PIPELINE_DIR}/submit_job.sh --conserting_sc_cnv --bam_dir /path/to/BAMs/ \n\n\
 Ginkgo CNV analysis: \n\t\
     Required: -b/--bam_dir <arg> \n\t\
-    Optional: --results_dir <arg> (default bam_dir), --kb_bin_size <arg> (default 500), --bam_regex <arg> (default .*.bam), --bam_suffix <arg> (default .bam) --group_segmentation \n\t\
+    Optional: --results_dir <arg> (default bam_dir), --kb_bin_size <arg> (default 500), --bam_regex <arg> (default .*.bam), --bam_suffix <arg> (default .bam) --group_segmentation, --b37/--hg19 (default hg38) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --ginkgo_cnv --bam_dir /path/to/BAMs/ \n\n\
 Demultiplexer: \n\t\
@@ -60,6 +60,8 @@ while [ "$1" != "" ]; do
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
+                                ;;
+        --hg19 )                GENOME_VERSION="hg19"
                                 ;;
         --b37 )                 GENOME_VERSION="b37"
                                 ;;
@@ -207,7 +209,12 @@ elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ]; then
         if [ $GROUP_SEGMENTATION -eq 1 ]; then
             OPTIONS+=( "--group_segmentation" )
         fi
-        REFERENCE_DIR="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/ginkgo/genomes/hg38"
+        if [ $GENOME_VERSION = "hg19" ]; then
+            OPTIONS+=( "--hg19" )
+        elif [ $GENOME_VERSION = "b37" ]; then
+            OPTIONS+=( "--b37" )
+        fi
+        REFERENCE_DIR="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/ginkgo/genomes/${GENOME_VERSION}"
         if [ ! -f "${REFERENCE_DIR}/variable_${KB_BIN_SIZE}000_76_bwa" ]; then
             echo "The reference files for that kb bin size have not been created. Exiting with code 1"
             exit 1
