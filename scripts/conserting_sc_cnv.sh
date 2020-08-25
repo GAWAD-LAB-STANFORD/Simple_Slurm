@@ -33,7 +33,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-ml perl R/3.6.1 biology samtools bedtools
+ml perl R/4.0.2 biology samtools bedtools
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi

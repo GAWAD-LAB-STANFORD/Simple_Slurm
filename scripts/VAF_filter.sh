@@ -67,7 +67,7 @@ if [ ! -z $MQ ]; then
     OPTIONS+=( "--mq $MQ" )
 fi
 
-ml R/3.6.1 python/3.6.1
+ml R/4.0.2 python/3.6.1
 export PYTHONPATH=/home/groups/cgawad/python_libs/lib/python3.6/site-packages:$PYTHONPATH
 
 echo "Converting VCF to TSV - $(date)"

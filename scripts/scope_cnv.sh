@@ -42,7 +42,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-ml R/3.6.1
+ml R/4.0.2
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$EXPERIMENTAL_DIR
 fi
