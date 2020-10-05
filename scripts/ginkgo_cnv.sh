@@ -44,11 +44,6 @@ while [ "$1" != "" ]; do
 done
 
 echo -e "START: $(date)\nBam dir: ${BAM_DIR}\nBam regex: ${BAM_REGEX}\nBam suffix: ${BAM_SUFFIX}\nKb bin size: $KB_BIN_SIZE"
-
-ml php R/4.0.2 biology bedtools samtools
-
-SAMPLE_ARRAY=( $(find ${BAM_DIR}/ -maxdepth 1 -regextype sed -regex ".*/${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
-echo -e "Number of samples: ${#SAMPLE_ARRAY[@]}\nSamples: ${SAMPLE_ARRAY[@]}"
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi
@@ -56,6 +51,11 @@ if [ ! -d $FULL_WORK_DIR ]; then
     mkdir $FULL_WORK_DIR
 fi
 cd $GINKGO_DIR
+
+ml php R/4.0.2 biology bedtools samtools
+
+SAMPLE_ARRAY=( $(find ${BAM_DIR}/ -maxdepth 1 -regextype sed -regex ".*/${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
+echo -e "Number of samples: ${#SAMPLE_ARRAY[@]}\nSamples: ${SAMPLE_ARRAY[@]}"
 
 > ${FULL_WORK_DIR}/list
 for SAMPLE in ${SAMPLE_ARRAY[@]}; do

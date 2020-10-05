@@ -34,6 +34,11 @@ Monovar variant caller: \n\t\
     Optional: --results_dir <arg> (default bam_dir), --bam_suffix <arg> (default .bam) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --monovar --project Monovar --bam_dir /path/to/BAMs/ \n\n\
+Lorenz curve: \n\t\
+    Required: -b/--bam_dir <arg>, -p/--project <arg> \n\t\
+    Optional: --results_dir <arg> (default bam_dir), --kb_bin_size <arg> (default 500), --bam_regex <arg> (default .*.bam), --bam_suffix <arg> (default .bam) \n\t\
+    Run like: \n\t\t\
+        sh ${PIPELINE_DIR}/submit_job.sh --lorenz_curve --bam_dir /path/to/BAMs/ --project PTA_BAMs \n\n\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
@@ -57,6 +62,8 @@ while [ "$1" != "" ]; do
         --vaf_filter )          PROGRAM="VAF_filter"
                                 ;;
         --monovar )             PROGRAM="monovar"
+                                ;;
+        --lorenz_curve )        PROGRAM="lorenz_curve"
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
@@ -159,7 +166,7 @@ if [ $PROGRAM = "scope_cnv" ]; then
     sbatch ${SLURM_OPTIONS[@]} -J $PROJECT -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
         ${PIPELINE_DIR}/scripts/scope_cnv.sh \
         --script_dir ${PIPELINE_DIR}/scripts --bam_dir $BAM_DIR --project $PROJECT ${OPTIONS[@]}
-elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ]; then
+elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ] || [ $PROGRAM = "lorenz_curve" ]; then
     if [ -z $BAM_DIR ] || [ ! -d $BAM_DIR ] || [ -z $PIPELINE_DIR ]; then
         echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
         exit 1
@@ -205,7 +212,7 @@ elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ]; then
         fi
         sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
             --array=1-$NUM_SAMPLES ${PIPELINE_DIR}/scripts/conserting_sc_cnv.sh --bam_dir $BAM_DIR ${OPTIONS[@]}
-    else
+    elif [ $PROGRAM = "ginkgo_cnv" ]; then
         if [ $GROUP_SEGMENTATION -eq 1 ]; then
             OPTIONS+=( "--group_segmentation" )
         fi
@@ -221,6 +228,14 @@ elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ]; then
         fi
         sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
             ${PIPELINE_DIR}/scripts/ginkgo_cnv.sh --bam_dir $BAM_DIR ${OPTIONS[@]}
+    else
+        if [ -z $PROJECT ]; then
+            echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
+            exit 1
+        fi
+        sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
+            ${PIPELINE_DIR}/scripts/lorenz_curve.sh --bam_dir $BAM_DIR --pipeline_dir $PIPELINE_DIR \
+            --err_out_dir $STD_ERR_OUT_DIR --project $PROJECT ${OPTIONS[@]}
     fi
 elif [ $PROGRAM = "demultiplex" ]; then
     if [ -z $SAMPLE_SHEET ]; then

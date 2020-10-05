@@ -32,3 +32,4 @@
             - Initial_Concentration column with as many entries as samples
     - Variant Allele Frequency filter
     - Monovar Variant Caller
+    - Lorenz Curve and Gini Index
