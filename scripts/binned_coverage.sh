@@ -18,7 +18,8 @@ cd $BAM_DIR
 
 ml biology samtools python/3.6.1
 
-SAMPLE_ARRAY=( $(find ${BAM_DIR}/ -maxdepth 1 -regextype sed -regex ".*/${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
+SAMPLE_ARRAY=( $(find ${BAM_DIR}/ -maxdepth 1 -regextype sed -regex ".*/${BAM_REGEX}" -exec basename {} \; | \
+    grep -v ".temp_n22chr.bam" | sed "s/${BAM_SUFFIX}//") )
 SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
 echo -e "START: $(date)\nSample: $SAMPLE"
 
@@ -29,19 +30,22 @@ if [ ! -f ${SAMPLE}${BAM_SUFFIX}.bai ]; then
 fi
 
 echo "Bam to n22chr - START: $(date)"
-samtools view -b -L /oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg38/Homo_sapiens_assembly38_n22chr.bed ${SAMPLE}${BAM_SUFFIX} > ${SAMPLE}.temp_n22chr.bam
+samtools view -b -L ${REFERENCE_DIR}/Homo_sapiens_assembly38_n22chr.bed ${SAMPLE}${BAM_SUFFIX} > ${SAMPLE}.temp_n22chr.bam
 echo "Bam to n22chr - END: $(date)"
 
-echo "Index bam - START: $(date)"
+echo "Index n22chr bam - START: $(date)"
 samtools index ${SAMPLE}.temp_n22chr.bam
-echo "Index bam - END: $(date)"
+echo "Index n22chr bam - END: $(date)"
 
 echo "Bam to bedgraph - START: $(date)"
-/home/groups/cgawad/python_libs/bin/bamCoverage --bam ${SAMPLE}.temp_n22chr.bam --outFileName ${SAMPLE}.temp_binned_coverage.bedgraph --binSize ${KB_BIN_SIZE}000 --outFileFormat bedgraph
-grep -P "^chr..?\t" ${SAMPLE}.temp_binned_coverage.bedgraph | grep -Ev "chrX|chrY|chrM"> ${SAMPLE}.binned_coverage.bedgraph
+/home/groups/cgawad/python_libs/bin/bamCoverage --bam ${SAMPLE}.temp_n22chr.bam \
+    --outFileName ${SAMPLE}.temp_${KB_BIN_SIZE}kb_bins_coverage.bedgraph \
+    --binSize ${KB_BIN_SIZE}000 --outFileFormat bedgraph
+grep -P "^chr..?\t" ${SAMPLE}.temp_${KB_BIN_SIZE}kb_bins_coverage.bedgraph | \
+    grep -Ev "chrX|chrY|chrM"> ${SAMPLE}.${KB_BIN_SIZE}kb_bins_coverage.bedgraph
 echo "Bam to bedgraph - END: $(date)"
 
 rm ${SAMPLE}.temp_n22chr.bam
 rm ${SAMPLE}.temp_n22chr.bam.bai
-rm ${SAMPLE}.temp_binned_coverage.bedgraph
+rm ${SAMPLE}.temp_${KB_BIN_SIZE}kb_bins_coverage.bedgraph
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"

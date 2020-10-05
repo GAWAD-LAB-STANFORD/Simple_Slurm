@@ -51,7 +51,8 @@ cd $BAM_DIR
 
 ml R/4.0.2
 
-SAMPLE_ARRAY=( $(find ${BAM_DIR}/ -maxdepth 1 -regextype sed -regex ".*/${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
+SAMPLE_ARRAY=( $(find ${BAM_DIR}/ -maxdepth 1 -regextype sed -regex ".*/${BAM_REGEX}" -exec basename {} \; | \
+    grep -v ".temp_n22chr.bam" | sed "s/${BAM_SUFFIX}//") )
 echo -e "Number of samples: ${#SAMPLE_ARRAY[@]}\nSamples: ${SAMPLE_ARRAY[@]}"
 
 echo "Binning coverage for BAMs - START: $(date)"
@@ -61,14 +62,14 @@ sbatch --wait -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out 
 echo "Binning coverage for BAMs - END: $(date)"
 
 echo "Consolidating coverages - START: $(date)"
-echo -e "sample\tchr\tstart\tend\tcoverage" > ${PROJECT}.binned_coverage.tsv
-BEDGRAPH_FILES=( $(ls *.binned_coverage.bedgraph) )
+echo -e "sample\tchr\tstart\tend\tcoverage" > ${PROJECT}.${KB_BIN_SIZE}kb_bins_coverage.tsv
+BEDGRAPH_FILES=( $(ls *.${KB_BIN_SIZE}kb_bins_coverage.bedgraph) )
 for BEDGRAPH in ${BEDGRAPH_FILES[@]}; do
-    SAMPLE=$(echo $BEDGRAPH | sed "s/.binned_coverage.bedgraph//")
-    awk -v var=$SAMPLE '{print var"\t"$0 }' $BEDGRAPH >> ${PROJECT}.binned_coverage.tsv
+    SAMPLE=$(echo $BEDGRAPH | sed "s/.${KB_BIN_SIZE}kb_bins_coverage.bedgraph//")
+    awk -v var=$SAMPLE '{print var"\t"$0 }' $BEDGRAPH >> ${PROJECT}.${KB_BIN_SIZE}kb_bins_coverage.tsv
 done
 rm ${BEDGRAPH_FILES[@]}
-mv ${PROJECT}.binned_coverage.tsv ${RESULTS_DIR}/${PROJECT}.binned_coverage.tsv
+mv ${PROJECT}.${KB_BIN_SIZE}kb_bins_coverage.tsv ${RESULTS_DIR}/${PROJECT}.${KB_BIN_SIZE}kb_bins_coverage.tsv
 cd $RESULTS_DIR
 echo "Consolidating coverages - END: $(date)"
 

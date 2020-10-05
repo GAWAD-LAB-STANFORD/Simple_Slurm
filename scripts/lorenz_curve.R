@@ -1,6 +1,7 @@
 suppressPackageStartupMessages({
   library(tidyverse)
   library(gglorenz)
+  library(lorenzgini)
 })
 args <- commandArgs(trailingOnly = TRUE)
 project <- args[1]
@@ -16,12 +17,21 @@ ggplot_theme<- theme(axis.line.y = element_line(size=.1,color = "black"), axis.l
                      panel.grid.major.x = element_line(size=.1, color="grey"), panel.grid.major.y = element_blank(), 
                      plot.title = element_text(size=15), legend.text=element_text(size=8))
 
-df <- read_tsv(sprintf("%s.binned_coverage.tsv", project)) %>%
+df <- read_tsv(sprintf("%s.%skb_bins_coverage.tsv", project, kb_bin_width)) %>%
   group_by(chr, start) %>%
   mutate(abs_start = chr_starts[which(chr_names == chr)] + start) %>%
   ungroup() %>%
   select(-chr, -start, -end)
+
+gini_df <- data.frame()
+for (temp_sample in unique(df$sample)) {
+  sample_df <- filter(df, sample == temp_sample)
+  gini_df <- rbind(gini_df, data.frame(sample = temp_sample, gini = gini(sample_df$coverage)))
+}
+write_tsv(gini_df, sprintf("%s.%skb_bins_gini_indices.tsv", project, kb_bin_width))
+
 fig <- ggplot(df, aes(x = coverage, color = sample)) + 
-  stat_lorenz() + ggplot_theme + annotate_ineq(df$coverage) +
+  stat_lorenz() + ggplot_theme + geom_abline(linetype = "dashed") +
   labs(title = sprintf("%s coverage inquality - %skb bins", project, kb_bin_width), x = "Cumulative fraction of genome", y = "Cumulative fraction of total reads")
+fig
 ggsave(sprintf("%s.%skb_bins_lorenz_curve.pdf", project, kb_bin_width), fig, width = 11, height = 8)
