@@ -33,5 +33,4 @@ write_tsv(gini_df, sprintf("%s.%skb_bins_gini_indices.tsv", project, kb_bin_widt
 fig <- ggplot(df, aes(x = coverage, color = sample)) + 
   stat_lorenz() + ggplot_theme + geom_abline(linetype = "dashed") +
   labs(title = sprintf("%s coverage inquality - %skb bins", project, kb_bin_width), x = "Cumulative fraction of genome", y = "Cumulative fraction of total reads")
-fig
 ggsave(sprintf("%s.%skb_bins_lorenz_curve.pdf", project, kb_bin_width), fig, width = 11, height = 8)
