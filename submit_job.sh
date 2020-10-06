@@ -36,7 +36,7 @@ Monovar variant caller: \n\t\
         sh ${PIPELINE_DIR}/submit_job.sh --monovar --project Monovar --bam_dir /path/to/BAMs/ \n\n\
 Lorenz curve: \n\t\
     Required: -b/--bam_dir <arg>, -p/--project <arg> \n\t\
-    Optional: --results_dir <arg> (default bam_dir), --kb_bin_size <arg> (default 500), --bam_regex <arg> (default .*.bam), --bam_suffix <arg> (default .bam) \n\t\
+    Optional: --results_dir <arg> (default bam_dir), --kb_bin_size <arg> (default 1000), --bam_regex <arg> (default .*.bam), --bam_suffix <arg> (default .bam) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --lorenz_curve --bam_dir /path/to/BAMs/ --project PTA_BAMs \n\n\
 For more information, read the README.md"
