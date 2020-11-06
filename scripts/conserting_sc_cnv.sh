@@ -38,7 +38,7 @@ if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi
 cd $RESULTS_DIR
-SAMPLE=$(find ${BAM_DIR}/ -maxdepth 1 -regextype sed -regex ".*/${BAM_REGEX}" -exec basename {} \; | \
+SAMPLE=$(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | \
     sed "s/${BAM_SUFFIX}//" | sed -n ${SLURM_ARRAY_TASK_ID}p)
 echo -e "Slurm ID: ${SLURM_ARRAY_TASK_ID}\nSample: ${SAMPLE}\nKb bin size: ${KB_BIN_SIZE}\nResults dir: ${RESULTS_DIR}"
 echo -e "Bam dir: ${BAM_DIR}\nBam regex: ${BAM_REGEX}\nBam suffix: ${BAM_SUFFIX}"

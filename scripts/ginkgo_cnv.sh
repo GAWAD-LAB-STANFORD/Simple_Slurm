@@ -54,7 +54,7 @@ cd $GINKGO_DIR
 
 ml php R/4.0.2 biology bedtools samtools
 
-SAMPLE_ARRAY=( $(find ${BAM_DIR}/ -maxdepth 1 -regextype sed -regex ".*/${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
+SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
 echo -e "Number of samples: ${#SAMPLE_ARRAY[@]}\nSamples: ${SAMPLE_ARRAY[@]}"
 
 > ${FULL_WORK_DIR}/list

@@ -18,7 +18,7 @@ cd $BAM_DIR
 
 ml biology samtools python/3.6.1
 
-SAMPLE_ARRAY=( $(find ${BAM_DIR}/ -maxdepth 1 -regextype sed -regex ".*/${BAM_REGEX}" -exec basename {} \; | \
+SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | \
     grep -v ".temp_n22chr.bam" | sed "s/${BAM_SUFFIX}//") )
 SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
 echo -e "START: $(date)\nSample: $SAMPLE"
