@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #SBATCH --job-name=binned_coverage
-#SBATCH --mem=15GB
+#SBATCH --mem=15G
 #SBATCH --cpus-per-task=1
 #SBATCH --time=12:00:00
 #SBATCH --partition=cgawad

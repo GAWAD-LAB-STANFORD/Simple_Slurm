@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #SBATCH --job-name=monovar
-#SBATCH --mem=64GB
+#SBATCH --mem=64G
 #SBATCH --cpus-per-task=4
 #SBATCH --time=6-00:00:00
 #SBATCH --partition=cgawad
