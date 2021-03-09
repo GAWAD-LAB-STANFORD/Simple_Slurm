@@ -46,6 +46,7 @@ GROUP_SEGMENTATION=0
 GENOME_VERSION="hg38"
 PROGRAM="none"
 COMBINE_BLACKLISTS=0
+KB_BIN_SIZE="500"
 while [ "$1" != "" ]; do
     case $1 in
         -h | --help )           echo -e $HELP
@@ -229,6 +230,7 @@ elif [ $PROGRAM = "conserting_sc_cnv" ] || [ $PROGRAM = "ginkgo_cnv" ] || [ $PRO
         sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
             ${PIPELINE_DIR}/scripts/ginkgo_cnv.sh --bam_dir $BAM_DIR ${OPTIONS[@]}
     else
+        KB_BIN_SIZE="1000"
         if [ -z $PROJECT ]; then
             echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
             exit 1
