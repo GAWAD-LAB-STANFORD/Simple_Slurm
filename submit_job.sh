@@ -39,6 +39,11 @@ Lorenz curve: \n\t\
     Optional: --results_dir <arg> (default bam_dir), --kb_bin_size <arg> (default 1000), --bam_regex <arg> (default .*.bam), --bam_suffix <arg> (default .bam) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --lorenz_curve --bam_dir /path/to/BAMs/ --project PTA_BAMs \n\n\
+Circle map: \n\t\
+    Required: -b/--bam_dir <arg> \n\t\
+    Optional: --results_dir <arg> (default bam_dir), --ref_fasta <arg> (default hg38), --bam_suffix <arg> (default .bam) \n\t\
+    Run like: \n\t\t\
+        sh ${PIPELINE_DIR}/submit_job.sh --lorenz_curve --bam_dir /path/to/BAMs/ --project PTA_BAMs \n\n\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
@@ -65,6 +70,8 @@ while [ "$1" != "" ]; do
         --monovar )             PROGRAM="monovar"
                                 ;;
         --lorenz_curve )        PROGRAM="lorenz_curve"
+                                ;;
+        --circle_map )        PROGRAM="lorenz_curve"
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
@@ -332,6 +339,38 @@ elif [ $PROGRAM = "monovar" ]; then
     fi
     sbatch ${SLURM_OPTIONS[@]} -e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
         ${PIPELINE_DIR}/scripts/monovar.sh --project $PROJECT --bam_dir $BAM_DIR ${OPTIONS[@]}
+elif [ $PROGRAM = "circle_map" ]; then
+    if [ -z $BAM_DIR ]; then
+        echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
+        exit 1
+    fi
+    if [ ! -z $BAM_SUFFIX ]; then
+        OPTIONS+=( "--bam_suffix $BAM_SUFFIX" )
+    else
+        BAM_SUFFIX=".bam"
+    fi
+    if [ ! -z $REF_FASTA ]; then
+        OPTIONS+=( "--ref_fasta $REF_FASTA" )
+    fi
+    if [ ! -z $RESULTS_DIR ]; then
+        OPTIONS+=( "--results_dir $RESULTS_DIR" )
+    fi
+    if [ -z $STD_ERR_OUT_DIR ]; then
+        STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
+    fi
+    if [ ! -d $STD_ERR_OUT_DIR ]; then
+        mkdir $STD_ERR_OUT_DIR
+    fi
+    SAMPLE_ARRAY=( $(ls ${BAM_DIR}/*${BAM_SUFFIX} | sed "s/${BAM_SUFFIX}//") )
+    SAMPLES_STRING=$( IFS=$':'; echo "${SAMPLE_ARRAY[*]}" )
+    JOB_COUNT=${#SAMPLE_ARRAY[@]}
+    if [ $JOB_COUNT -eq 0 ]; then
+        echo "No BAM files found in the bam directory. Exiting with code 1"
+        exit 1
+    fi
+    sbatch --parsable -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
+        --array=1-${JOB_COUNT} ${SCRIPT_DIR}/circle_map.sh \
+        $BAM_DIR $SAMPLES_STRING ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0
