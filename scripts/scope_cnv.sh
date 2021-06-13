@@ -43,6 +43,7 @@ while [ "$1" != "" ]; do
 done
 
 ml R/4.0.2
+export R_LIBS="/home/groups/cgawad/R_libs"
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$EXPERIMENTAL_DIR
 fi

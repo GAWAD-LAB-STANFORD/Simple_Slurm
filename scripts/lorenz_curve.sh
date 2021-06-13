@@ -50,6 +50,7 @@ echo -e "Bam suffix: ${BAM_SUFFIX}\nKb bin size: $KB_BIN_SIZE\nResults dir: ${RE
 cd $BAM_DIR
 
 ml R/4.0.2
+export R_LIBS="/home/groups/cgawad/R_libs"
 
 SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | \
     grep -v ".temp_n22chr.bam" | sed "s/${BAM_SUFFIX}//") )
