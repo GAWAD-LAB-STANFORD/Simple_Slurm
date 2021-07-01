@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+#SBATCH --job-name=circle_map
+#SBATCH --mem=64G
+#SBATCH --time=1-00:00:00
+#SBATCH --partition=cgawad
+
+START_TIME=$(date +%s)
+REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/Homo_sapiens_assembly38.fasta"
+TOOLS_DIR="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/"
+
+while [ "$1" != "" ]; do
+    case $1 in
+        --project )         shift
+                            PROJECT=$1
+                            ;;
+        --vcf )             shift
+                            REF_FASTA=$1
+                            ;;
+        --tsv )             shift
+                            REF_FASTA=$1
+                            ;;
+        --results_dir )     shift
+                            RESULTS_DIR=$1
+                            ;;
+        --ref_fasta )       shift
+                            REF_FASTA=$1
+                            ;;
+        --script_dir )      shift
+                            SCRIPT_DIR=$1
+                            ;;                   
+    esac
+    shift
+done
+
+echo -e "START: $(date)\nProject: $PROJECT"
+if [ ! -z $VCF ]; then
+    echo "VCF: $VCF"
+    TSV=$(echo $VCF | sed "s/.gz//" | sed "s/.vcf/.tsv/")
+fi
+if [ -z $RESULTS_DIR ]; then
+    RESULTS_DIR=$(dirname $TSV)
+fi
+echo -e "TSV: $TSV\nResults dir: $RESULTS_DIR\nRef fasta: $REF_FASTA"
+cd $RESULTS_DIR
+
+ml R/4.0.2 java perl biology gatk bedtools samtools
+export R_LIBS="/home/groups/cgawad/R_libs"
+
+ml python/3.6.1
+export PYTHONPATH=/home/groups/cgawad/python_libs/lib/python3.6/site-packages:$PYTHONPATH
+export PATH=/home/groups/cgawad/python_libs/bin:$PATH
+
+if [ ! -z $VCF ]; then
+    echo "### Convert annotated VCF to TSV ### - START: $(date)"
+    ${TOOLS_DIR}/vcflib/bin/vcf2tsv -g $VCF > $TSV
+    sed -i "s/#CHROM/CHROM/" $TSV
+    echo "### Convert annotated VCF to TSV ### - END: $(date)"
+fi
+
+echo "### Extracting unique variant positions ### - START: $(date)"
+cut -f 1,2,4,5 $TSV | uniq > ${PROJECT}.temp_bedtools_reformat.tsv
+echo "### Extracting unique variant positions ### - START: $(date)"
+
+echo "### Reformatting for bedtools input ### - START: $(date)"
+Rscript ${SCRIPT_DIR}/SigProfiler_1_Bedtools_Reformat.R ${PROJECT}.temp_bedtools_reformat.tsv \
+    ${PROJECT}.temp_bedtools_before_input.tsv ${PROJECT}.temp_bedtools_after_input.tsv
+echo "### Reformatting for bedtools input ### - END: $(date)"
+
+echo "### Obtaining previous and subsequent reference base ### - START: $(date)"
+bedtools getfasta -fi $REF_FASTA -bed ${PROJECT}.temp_bedtools_before_input.tsv \
+    -bedOut > ${PROJECT}.temp_bedtools_before_output.tsv
+echo "Previous base obtained"
+bedtools getfasta -fi $REF_FASTA -bed ${PROJECT}.temp_bedtools_after_input.tsv \
+    -bedOut > ${PROJECT}.temp_bedtools_after_output.tsv
+echo "Subsequent base obtained"
+echo "### Obtaining previous and subsequent reference base ### - END: $(date)"
+
+echo "### Reformatting into trinucleotide context ### - START: $(date)"
+Rscript SigProfiler_2_Trinucleotide_Reformat.R ${PROJECT}.temp_bedtools_reformat.tsv \
+    ${PROJECT}.temp_bedtools_before_output.tsv ${PROJECT}.temp_bedtools_after_output.tsv \
+    ${PROJECT}.temp_trinucleotide.tsv ${SCRIPT_DIR}/Mutation_Types.tsv
+echo "### Reformatting into trinucleotide context ### - END: $(date)"
+
+echo "### Obtaining mutational signature with SigProfiler ### - START: $(date)"
+python3 -u SigProfiler_3_Extractor.py ${PROJECT}.temp_trinucleotide.tsv \
+    ${PROJECT}_SigProfiler_Results $RESULTS_DIR
+echo "### Obtaining mutational signature with SigProfiler ### - END: $(date)"
+
+rm ${PROJECT}.temp_bedtools_reformat.tsv 
+rm ${PROJECT}.temp_bedtools_before_input.tsv ${PROJECT}.temp_bedtools_after_input.tsv 
+rm ${PROJECT}.temp_bedtools_before_output.tsv ${PROJECT}.temp_bedtools_after_output.tsv
+rm ${PROJECT}.temp_trinucleotide.tsv
+echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"

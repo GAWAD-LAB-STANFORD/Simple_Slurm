@@ -43,7 +43,12 @@ Circle map: \n\t\
     Required: -b/--bam_dir <arg> \n\t\
     Optional: --results_dir <arg> (default bam_dir), --ref_fasta <arg> (default hg38), --bam_suffix <arg> (default .bam) \n\t\
     Run like: \n\t\t\
-        sh ${PIPELINE_DIR}/submit_job.sh --lorenz_curve --bam_dir /path/to/BAMs/ --project PTA_BAMs \n\n\
+        sh ${PIPELINE_DIR}/submit_job.sh --circle_map --bam_dir /path/to/BAMs/ --project PTA_BAMs \n\n\
+SigProfiler: \n\t\
+    Required: --project <arg> and either --vcf <arg> or --tsv <arg> \n\t\
+    Optional: --results_dir (default is where --vcf or --tsv is located), --ref_fasta (default hg38) \n\t\
+    Run like: \n\t\t\
+        sh ${PIPELINE_DIR}/submit_job.sh --sig_profiler --project SigProfiler --vcf /path/to/my_variants.vcf.gz \n\n\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
@@ -71,7 +76,9 @@ while [ "$1" != "" ]; do
                                 ;;
         --lorenz_curve )        PROGRAM="lorenz_curve"
                                 ;;
-        --circle_map )        PROGRAM="lorenz_curve"
+        --circle_map )          PROGRAM="circle_map"
+                                ;;
+        --sig_profiler )        PROJECT="sig_profiler"
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
@@ -355,6 +362,9 @@ elif [ $PROGRAM = "circle_map" ]; then
     if [ ! -z $RESULTS_DIR ]; then
         OPTIONS+=( "--results_dir $RESULTS_DIR" )
     fi
+    if [ ! -d $RESULTS_DIR ]; then
+        mkdir $RESULTS_DIR
+    fi
     if [ -z $STD_ERR_OUT_DIR ]; then
         STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
     fi
@@ -368,9 +378,38 @@ elif [ $PROGRAM = "circle_map" ]; then
         echo "No BAM files found in the bam directory. Exiting with code 1"
         exit 1
     fi
-    sbatch --parsable -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
-        --array=1-${JOB_COUNT} ${SCRIPT_DIR}/circle_map.sh \
-        $BAM_DIR $SAMPLES_STRING ${OPTIONS[@]}
+    sbatch -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
+        --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/circle_map.sh \
+        --bam_dir $BAM_DIR --samples_string $SAMPLES_STRING ${OPTIONS[@]}
+elif [ $PROGRAM = "sig_profiler" ]; then
+    if [ -z $PROJECT ] || ([ -z $VCF ] && [ -z $TSV ]); then
+        echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
+        exit 1
+    fi
+    if [ ! -z $VCF ]; then
+        OPTIONS+=( "--vcf $VCF" )
+    fi
+    if [ ! -z $TSV ]; then
+        OPTIONS+=( "--tsv $TSV" )
+    fi
+    if [ ! -z $REF_FASTA ]; then
+        OPTIONS+=( "--ref_fasta $REF_FASTA" )
+    fi
+    if [ ! -z $RESULTS_DIR ]; then
+        OPTIONS+=( "--results_dir $RESULTS_DIR" )
+    fi
+    if [ ! -d $RESULTS_DIR ]; then
+        mkdir $RESULTS_DIR
+    fi
+    if [ -z $STD_ERR_OUT_DIR ]; then
+        STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
+    fi
+    if [ ! -d $STD_ERR_OUT_DIR ]; then
+        mkdir $STD_ERR_OUT_DIR
+    fi
+    sbatch -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
+        ${PIPELINE_DIR}/scripts/SigProfiler.sh --project $PROJECT --ref_fasta $REF_FASTA \
+        --script_dir ${PIPELINE_DIR}/scripts/ ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0
