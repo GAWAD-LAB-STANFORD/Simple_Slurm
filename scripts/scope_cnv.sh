@@ -47,6 +47,8 @@ export R_LIBS="/home/groups/cgawad/R_libs"
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$EXPERIMENTAL_DIR
 fi
+echo -e "START: $(date)\nScript dir: $SCRIPT_DIR\nBam dir: $BAM_DIR\nBam regex: $BAM_REGEX"
+echo -e "Bam suffix: $BAM_SUFFIX\nProject: $PROJECT\nKb bin size: $KB_BIN_SIZE\nResults_dir: $RESULTS_DIR"
 cd $RESULTS_DIR
 
 if [ $GENOME_VERSION = "b37" ]; then

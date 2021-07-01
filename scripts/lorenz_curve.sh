@@ -42,11 +42,11 @@ while [ "$1" != "" ]; do
     shift
 done
 
-echo -e "START: $(date)\nProject: ${PROJECT}\nBam dir: ${BAM_DIR}\nBam regex: ${BAM_REGEX}"
+echo -e "START: $(date)\nProject: $PROJECT\nBam dir: $BAM_DIR\nBam regex: $BAM_REGEX"
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi
-echo -e "Bam suffix: ${BAM_SUFFIX}\nKb bin size: $KB_BIN_SIZE\nResults dir: ${RESULTS_DIR}"
+echo -e "Bam suffix: $BAM_SUFFIX\nKb bin size: $KB_BIN_SIZE\nResults dir: $RESULTS_DIR"
 cd $BAM_DIR
 
 ml R/4.0.2

@@ -41,8 +41,8 @@ fi
 cd $RESULTS_DIR
 SAMPLE=$(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | \
     sed "s/${BAM_SUFFIX}//" | sed -n ${SLURM_ARRAY_TASK_ID}p)
-echo -e "Slurm ID: ${SLURM_ARRAY_TASK_ID}\nSample: ${SAMPLE}\nKb bin size: ${KB_BIN_SIZE}\nResults dir: ${RESULTS_DIR}"
-echo -e "Bam dir: ${BAM_DIR}\nBam regex: ${BAM_REGEX}\nBam suffix: ${BAM_SUFFIX}"
+echo -e "START: $(date)\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nKb bin size: $KB_BIN_SIZE\nResults dir: $RESULTS_DIR"
+echo -e "Bam dir: $BAM_DIR\nBam regex: $BAM_REGEX\nBam suffix: $BAM_SUFFIX"
 
 N25CHR_BED="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg38/Homo_sapiens_assembly38_n25chr.bed"
 BEDGRAPH_TO_WIG_TOOL="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/bedgraph_to_wig.pl"

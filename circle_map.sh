@@ -7,7 +7,7 @@
 
 START_TIME=$(date +%s)
 BAM_SUFFIX=".bam"
-REF_FASTA="${REFERENCE_DIR}/Homo_sapiens_assembly38.fasta"
+REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/Homo_sapiens_assembly38.fasta"
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -26,6 +26,7 @@ while [ "$1" != "" ]; do
         --ref_fasta )           shift
                                 REF_FASTA=$1
                                 ;;
+    esac
     shift
 done
 
@@ -35,7 +36,7 @@ if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi
 
-echo -e "START: $(date)\nWGS WES Pipeline\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nBam dir: $BAM_DIR\nResults dir: $RESULTS_DIR"
+echo -e "START: $(date)\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nBam dir: $BAM_DIR\nResults dir: $RESULTS_DIR"
 cd $RESULTS_DIR
 
 ml biology samtools bwa bedtools
