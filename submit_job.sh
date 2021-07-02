@@ -43,7 +43,7 @@ Circle map: \n\t\
     Required: -b/--bam_dir <arg> \n\t\
     Optional: --results_dir <arg> (default bam_dir), --ref_fasta <arg> (default hg38), --bam_suffix <arg> (default .bam) \n\t\
     Run like: \n\t\t\
-        sh ${PIPELINE_DIR}/submit_job.sh --circle_map --bam_dir /path/to/BAMs/ --project PTA_BAMs \n\n\
+        sh ${PIPELINE_DIR}/submit_job.sh --circle_map --bam_dir /path/to/BAMs/ \n\n\
 SigProfiler: \n\t\
     Required: --project <arg> and either --vcf <arg> or --tsv <arg> \n\t\
     Optional: --results_dir (default is where --vcf or --tsv is located), --ref_fasta (default hg38) \n\t\
