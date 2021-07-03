@@ -30,7 +30,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-SAMPLE_ARRAY=( $(echo $4 | sed 's/:/ /g') )
+SAMPLE_ARRAY=( $(echo $SAMPLES_STRING | sed 's/:/ /g') )
 SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
