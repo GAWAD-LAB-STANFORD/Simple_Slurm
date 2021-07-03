@@ -374,7 +374,7 @@ elif [ $PROGRAM = "circle_map" ]; then
     if [ ! -d $STD_ERR_OUT_DIR ]; then
         mkdir $STD_ERR_OUT_DIR
     fi
-    SAMPLE_ARRAY=( $(ls ${BAM_DIR}/*${BAM_SUFFIX} | sed "s/${BAM_SUFFIX}//") )
+    SAMPLE_ARRAY=( $(ls ${BAM_DIR}/*${BAM_SUFFIX} | xargs basename | sed "s/${BAM_SUFFIX}//") )
     SAMPLES_STRING=$( IFS=$':'; echo "${SAMPLE_ARRAY[*]}" )
     JOB_COUNT=${#SAMPLE_ARRAY[@]}
     if [ $JOB_COUNT -eq 0 ]; then
