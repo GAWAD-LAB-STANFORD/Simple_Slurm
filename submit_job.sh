@@ -362,6 +362,9 @@ elif [ $PROGRAM = "circle_map" ]; then
     if [ ! -z $RESULTS_DIR ]; then
         OPTIONS+=( "--results_dir $RESULTS_DIR" )
     fi
+    if [ -z $RESULTS_DIR ]; then
+        RESULTS_DIR=$BAM_DIR
+    fi
     if [ ! -d $RESULTS_DIR ]; then
         mkdir $RESULTS_DIR
     fi
