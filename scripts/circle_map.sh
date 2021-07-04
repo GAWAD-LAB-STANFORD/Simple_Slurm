@@ -52,6 +52,7 @@ echo "### Sort BAM by read name ### - END: $(date)"
 
 echo "### Sort BAM by leftmost mapping coordinates ### - START: $(date)"
 samtools sort -o ${SAMPLE}_sorted${BAM_SUFFIX} ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX}
+samtools index ${SAMPLE}_sorted${BAM_SUFFIX}
 echo "### Sort BAM by leftmost mapping coordinates ### - END: $(date)"
 
 echo "### Extract circular DNA rearrangements ### - START: $(date)"
