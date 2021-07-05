@@ -69,7 +69,6 @@ Circle-Map Realign -i ${SAMPLE}_sorted_circular_read_candidates${BAM_SUFFIX} \
     -qbam ${SAMPLE}_qname${BAM_SUFFIX} -sbam ${SAMPLE}_sorted${BAM_SUFFIX} \
     -fasta $REF_FASTA -o ${SAMPLE}_unknown_circle.bed
 echo "### Detect circular DNA ### - END: $(date)"
-
-rm ${SAMPLE}_qname${BAM_SUFFIX} ${SAMPLE}_sorted${BAM_SUFFIX} 
-rm ${SAMPLE}_circular_read_candidates${BAM_SUFFIX} ${SAMPLE}_sorted_circular_read_candidates${BAM_SUFFIX}
+ 
+rm ${SAMPLE}_circular_read_candidates${BAM_SUFFIX}
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
