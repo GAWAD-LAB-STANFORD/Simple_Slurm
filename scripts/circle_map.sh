@@ -2,11 +2,12 @@
 #
 #SBATCH --job-name=circle_map
 #SBATCH --mem=64G
-#SBATCH --time=1-00:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --partition=cgawad
 
 START_TIME=$(date +%s)
 BAM_SUFFIX=".bam"
+BAM_REGEX=".*.bam"
 REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/Homo_sapiens_assembly38.fasta"
 
 while [ "$1" != "" ]; do
@@ -22,6 +23,9 @@ while [ "$1" != "" ]; do
                                 ;;
         --bam_suffix )          shift
                                 BAM_SUFFIX=$1
+                                ;;
+        --bam_regex )           shift
+                                BAM_REGEX=$1
                                 ;;
         --ref_fasta )           shift
                                 REF_FASTA=$1
@@ -70,5 +74,5 @@ Circle-Map Realign -i ${SAMPLE}_sorted_circular_read_candidates${BAM_SUFFIX} \
     -fasta $REF_FASTA -o ${SAMPLE}_unknown_circle.bed
 echo "### Detect circular DNA ### - END: $(date)"
  
-rm ${SAMPLE}_circular_read_candidates${BAM_SUFFIX}
+# rm ${SAMPLE}_circular_read_candidates${BAM_SUFFIX}
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"

@@ -41,7 +41,7 @@ Lorenz curve: \n\t\
         sh ${PIPELINE_DIR}/submit_job.sh --lorenz_curve --bam_dir /path/to/BAMs/ --project PTA_BAMs \n\n\
 Circle map: \n\t\
     Required: -b/--bam_dir <arg> \n\t\
-    Optional: --results_dir <arg> (default bam_dir), --ref_fasta <arg> (default hg38), --bam_suffix <arg> (default .bam) \n\t\
+    Optional: --results_dir <arg> (default bam_dir), --ref_fasta <arg> (default hg38), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --circle_map --bam_dir /path/to/BAMs/ \n\n\
 SigProfiler: \n\t\
@@ -356,6 +356,11 @@ elif [ $PROGRAM = "circle_map" ]; then
     else
         BAM_SUFFIX=".bam"
     fi
+    if [ ! -z $BAM_REGEX ]; then
+        OPTIONS+=( "--bam_regex $BAM_REGEX" )
+    else
+        BAM_REGEX=".*.bam"
+    fi
     if [ ! -z $REF_FASTA ]; then
         OPTIONS+=( "--ref_fasta $REF_FASTA" )
     fi
@@ -374,7 +379,7 @@ elif [ $PROGRAM = "circle_map" ]; then
     if [ ! -d $STD_ERR_OUT_DIR ]; then
         mkdir $STD_ERR_OUT_DIR
     fi
-    SAMPLE_ARRAY=( $(ls ${BAM_DIR}/*${BAM_SUFFIX} | xargs -n 1 basename | sed "s/${BAM_SUFFIX}//") )
+    SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
     SAMPLES_STRING=$( IFS=$':'; echo "${SAMPLE_ARRAY[*]}" )
     JOB_COUNT=${#SAMPLE_ARRAY[@]}
     if [ $JOB_COUNT -eq 0 ]; then
