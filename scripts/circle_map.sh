@@ -1,46 +1,14 @@
 #!/bin/bash
-#
-#SBATCH --job-name=circle_map
-#SBATCH --mem=64G
-#SBATCH --time=3-00:00:00
-#SBATCH --partition=cgawad
 
 START_TIME=$(date +%s)
-BAM_SUFFIX=".bam"
-BAM_REGEX=".*.bam"
-REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/Homo_sapiens_assembly38.fasta"
-
-while [ "$1" != "" ]; do
-    case $1 in
-        --bam_dir )             shift
-                                BAM_DIR=$1
-                                ;;
-        --samples_string )      shift
-                                SAMPLES_STRING=$1
-                                ;;
-        --results_dir )         shift
-                                RESULTS_DIR=$1
-                                ;;
-        --bam_suffix )          shift
-                                BAM_SUFFIX=$1
-                                ;;
-        --bam_regex )           shift
-                                BAM_REGEX=$1
-                                ;;
-        --ref_fasta )           shift
-                                REF_FASTA=$1
-                                ;;
-    esac
-    shift
-done
-
-SAMPLE_ARRAY=( $(echo $SAMPLES_STRING | sed 's/:/ /g') )
+BAM_DIR=$1
+RESULTS_DIR=$2
+REF_FASTA=$3
+BAM_SUFFIX=$4
+SAMPLE_ARRAY=( $(echo $5 | sed 's/:/ /g') )
 SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
-if [ -z $RESULTS_DIR ]; then
-    RESULTS_DIR=$BAM_DIR
-fi
 
-echo -e "START: $(date)\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nBam dir: $BAM_DIR\nResults dir: $RESULTS_DIR"
+echo -e "START: $(date)\nWGS WES Pipeline\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nResults dir: $RESULTS_DIR"
 cd $RESULTS_DIR
 
 ml biology samtools bwa bedtools
@@ -55,7 +23,7 @@ samtools sort -n -o ${SAMPLE}_qname${BAM_SUFFIX} ${BAM_DIR}/${SAMPLE}${BAM_SUFFI
 echo "### Sort BAM by read name ### - END: $(date)"
 
 echo "### Sort BAM by leftmost mapping coordinates ### - START: $(date)"
-samtools sort -o ${SAMPLE}_sorted${BAM_SUFFIX} ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX}
+samtools sort -o ${SAMPLE}_sorted${BAM_SUFFIX} ${SAMPLE}${BAM_SUFFIX}
 samtools index ${SAMPLE}_sorted${BAM_SUFFIX}
 echo "### Sort BAM by leftmost mapping coordinates ### - END: $(date)"
 
@@ -74,5 +42,6 @@ Circle-Map Realign -i ${SAMPLE}_sorted_circular_read_candidates${BAM_SUFFIX} \
     -fasta $REF_FASTA -o ${SAMPLE}_unknown_circle.bed
 echo "### Detect circular DNA ### - END: $(date)"
  
-# rm ${SAMPLE}_circular_read_candidates${BAM_SUFFIX}
+rm ${SAMPLE}_qname${BAM_SUFFIX} ${SAMPLE}_sorted${BAM_SUFFIX}
+rm ${SAMPLE}_circular_read_candidates${BAM_SUFFIX} ${SAMPLE}_sorted_circular_read_candidates${BAM_SUFFIX}
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
