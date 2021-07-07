@@ -384,7 +384,7 @@ elif [ $PROGRAM = "circle_map" ]; then
         echo "No BAM files found in the bam directory. Exiting with code 1"
         exit 1
     fi
-    sbatch -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
+    sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
         --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/circle_map_runner.sh \
         --script_dir ${PIPELINE_DIR}/scripts --bam_dir $BAM_DIR --samples_string $SAMPLES_STRING ${OPTIONS[@]}
 elif [ $PROGRAM = "sig_profiler" ]; then
@@ -413,7 +413,7 @@ elif [ $PROGRAM = "sig_profiler" ]; then
     if [ ! -d $STD_ERR_OUT_DIR ]; then
         mkdir $STD_ERR_OUT_DIR
     fi
-    sbatch -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
+    sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
         ${PIPELINE_DIR}/scripts/SigProfiler.sh --project $PROJECT --ref_fasta $REF_FASTA \
         --script_dir ${PIPELINE_DIR}/scripts/ ${OPTIONS[@]}
 else
