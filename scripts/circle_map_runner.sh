@@ -33,8 +33,10 @@ while [ "$1" != "" ]; do
     shift
 done
 
+SAMPLE_ARRAY=( $(echo $SAMPLES_STRING | sed 's/:/ /g') )
+SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi
 
-srun --time=3-00:00:00 --mem=64G --partition=cgawad --pty bash ${SCRIPT_DIR}/circle_map.sh $BAM_DIR $RESULTS_DIR $REF_FASTA $BAM_SUFFIX $SAMPLES_STRING
+srun --time=3-00:00:00 --mem=64G --partition=cgawad --pty bash ${SCRIPT_DIR}/circle_map.sh $BAM_DIR $RESULTS_DIR $REF_FASTA $BAM_SUFFIX $SAMPLE

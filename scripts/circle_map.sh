@@ -5,8 +5,7 @@ BAM_DIR=$1
 RESULTS_DIR=$2
 REF_FASTA=$3
 BAM_SUFFIX=$4
-SAMPLE_ARRAY=( $(echo $5 | sed 's/:/ /g') )
-SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
+SAMPLE=$5
 
 echo -e "START: $(date)\nWGS WES Pipeline\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nResults dir: $RESULTS_DIR"
 cd $RESULTS_DIR
