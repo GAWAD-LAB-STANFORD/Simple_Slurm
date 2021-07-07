@@ -7,7 +7,7 @@
 
 START_TIME=$(date +%s)
 BAM_SUFFIX=".bam"
-REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/Homo_sapiens_assembly38.fasta"
+REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg38/Homo_sapiens_assembly38.fasta"
 
 while [ "$1" != "" ]; do
     case $1 in
