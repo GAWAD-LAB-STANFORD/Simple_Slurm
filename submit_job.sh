@@ -142,6 +142,12 @@ while [ "$1" != "" ]; do
         --ref_fasta )           shift
                                 REF_FASTA=$1
                                 ;;
+        --final_snps )          shift
+                                FINAL_SNPS=$1
+                                ;;
+        --final_indels )        shift
+                                FINAL_INDELS=$1
+                                ;;
         --vcf )                 shift
                                 VCF=$1
                                 ;;
