@@ -49,7 +49,7 @@ if [ "$FINAL_SNPS" != "0" ]; then
     if [ ! -f $FINAL_SNPS ]; then
         echo "$FINAL_SNPS final SNPs file not found. Cannot parsed annotated variants from circular regions"
     else
-        CIRCLE_SNPS=$(echo $FINAL_SNPS | sed "s/.tsv/circular.tsv/")
+        CIRCLE_SNPS="${SAMPLE}_snp_variants_in_circular_regions.tsv"
         Rscript ${SCRIPT_DIR}/circle_map_variants.R $FINAL_SNPS ${SAMPLE}_unknown_circle.bed $CIRCLE_SNPS
     fi
 fi
@@ -57,7 +57,7 @@ if [ "$FINAL_INDELS" != "0" ]; then
     if [ ! -f $FINAL_INDELS ]; then
         echo "$FINAL_INDELS final indels file not found. Cannot parsed annotated variants from circular regions"
     else
-        CIRCLE_INDELS=$(echo $FINAL_INDELS | sed "s/.tsv/circular.tsv/")
+        CIRCLE_INDELS="${SAMPLE}_indel_variants_in_circular_regions.tsv"
         Rscript ${SCRIPT_DIR}/circle_map_variants.R $FINAL_SNPS ${SAMPLE}_unknown_circle.bed $CIRCLE_INDELS
     fi
 fi
