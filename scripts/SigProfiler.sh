@@ -38,9 +38,6 @@ if [ ! -z $VCF ]; then
     echo "VCF: $VCF"
     TSV=$(echo $VCF | sed "s/.gz//" | sed "s/.vcf/.tsv/")
 fi
-if [ -z $RESULTS_DIR ]; then
-    RESULTS_DIR=$(dirname $TSV)
-fi
 echo -e "TSV: $TSV\nResults dir: $RESULTS_DIR\nRef fasta: $REF_FASTA"
 cd $RESULTS_DIR
 
@@ -79,16 +76,16 @@ echo "### Obtaining previous and subsequent reference base ### - END: $(date)"
 echo "### Reformatting into trinucleotide context ### - START: $(date)"
 Rscript SigProfiler_2_Trinucleotide_Reformat.R ${PROJECT}.temp_bedtools_reformat.tsv \
     ${PROJECT}.temp_bedtools_before_output.tsv ${PROJECT}.temp_bedtools_after_output.tsv \
-    ${PROJECT}.temp_trinucleotide.tsv ${SCRIPT_DIR}/Mutation_Types.tsv
+    ${PROJECT}.trinucleotide.tsv ${PROJECT}.temp_sigprofiler_input.tsv ${SCRIPT_DIR}/Mutation_Types.tsv
 echo "### Reformatting into trinucleotide context ### - END: $(date)"
 
 echo "### Obtaining mutational signature with SigProfiler ### - START: $(date)"
-python3 -u SigProfiler_3_Extractor.py ${PROJECT}.temp_trinucleotide.tsv \
+python3 -u SigProfiler_3_Extractor.py ${PROJECT}.temp_sigprofiler_input.tsv \
     ${PROJECT}_SigProfiler_Results $RESULTS_DIR
 echo "### Obtaining mutational signature with SigProfiler ### - END: $(date)"
 
 rm ${PROJECT}.temp_bedtools_reformat.tsv 
 rm ${PROJECT}.temp_bedtools_before_input.tsv ${PROJECT}.temp_bedtools_after_input.tsv 
 rm ${PROJECT}.temp_bedtools_before_output.tsv ${PROJECT}.temp_bedtools_after_output.tsv
-rm ${PROJECT}.temp_trinucleotide.tsv
+rm ${PROJECT}.temp_sigprofiler_input.tsv
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"

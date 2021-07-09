@@ -409,15 +409,18 @@ elif [ $PROGRAM = "sig_profiler" ]; then
     fi
     if [ ! -z $VCF ]; then
         OPTIONS+=( "--vcf $VCF" )
+        if [ -z $RESULTS_DIR ]; then
+            RESULTS_DIR=$(dirname $VCF)
+        fi
     fi
     if [ ! -z $TSV ]; then
         OPTIONS+=( "--tsv $TSV" )
+        if [ -z $RESULTS_DIR ]; then
+            RESULTS_DIR=$(dirname $TSV)
+        fi
     fi
     if [ ! -z $REF_FASTA ]; then
         OPTIONS+=( "--ref_fasta $REF_FASTA" )
-    fi
-    if [ ! -z $RESULTS_DIR ]; then
-        OPTIONS+=( "--results_dir $RESULTS_DIR" )
     fi
     if [ ! -d $RESULTS_DIR ]; then
         mkdir $RESULTS_DIR
@@ -430,7 +433,7 @@ elif [ $PROGRAM = "sig_profiler" ]; then
     fi
     sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
         ${PIPELINE_DIR}/scripts/SigProfiler.sh --project $PROJECT --ref_fasta $REF_FASTA \
-        --script_dir ${PIPELINE_DIR}/scripts/ ${OPTIONS[@]}
+        --script_dir ${PIPELINE_DIR}/scripts/ --results_dir $RESULTS_DIR ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0

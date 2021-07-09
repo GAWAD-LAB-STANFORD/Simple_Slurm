@@ -6,8 +6,9 @@ args <- commandArgs(trailingOnly = TRUE)
 input_file <- args[1]
 before_file <- args[2]
 after_file <- args[3]
-output_file <- args[4]
-mutation_types_file <- args[5]
+trint_file <- args[4]
+sigprofiler_input_file <- args[5]
+mutation_types_file <- args[6]
 
 df <- read.delim(input_file)
 before <- read.delim(before_file, header = FALSE) %>%
@@ -21,6 +22,7 @@ after <- read.delim(after_file, header = FALSE) %>%
 
 trint <- left_join(df, before, by = c("CHROM", "POS"))
 trint <- left_join(trint, after, by = c("CHROM", "POS"))
+write_tsv(trint, trint_file)
 
 wild <- trint %>%
   mutate(`Mutation.Types` = sprintf("%s[%s>%s]%s", Preceeding_base, REF, ALT, Succeeding_base)) %>%
@@ -33,4 +35,4 @@ mut_types <- read.delim(mutation_types_file)
 no_wild <- left_join(mut_types, wild, by = c("Mutation.Types"))
 no_wild[is.na(no_wild)] <- 0
 
-write_tsv(no_wild, output_file)
+write_tsv(no_wild, sigprofiler_input_file)
