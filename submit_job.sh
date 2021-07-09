@@ -139,6 +139,15 @@ while [ "$1" != "" ]; do
         --mq )                  shift
                                 MQ=$1
                                 ;;
+        --ref_fasta )           shift
+                                REF_FASTA=$1
+                                ;;
+        --vcf )                 shift
+                                VCF=$1
+                                ;;
+        --tsv )                 shift
+                                TSV=$1
+                                ;;
         --slurm )               shift
                                 SLURM_OPTIONS=${@:1}
                                 ;;
