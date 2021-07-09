@@ -13,7 +13,8 @@ FINAL_INDELS=$8
 echo -e "START: $(date)\nWGS WES Pipeline\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nResults dir: $RESULTS_DIR"
 cd $RESULTS_DIR
 
-ml biology samtools bwa bedtools
+ml R/4.0.2 biology samtools bwa bedtools
+export R_LIBS="/home/groups/cgawad/R_libs"
 ml python/3.6.1
 export PYTHONPATH=/home/groups/cgawad/python_libs/lib/python3.6/site-packages:$PYTHONPATH
 export PATH=/home/groups/cgawad/python_libs/bin:$PATH
