@@ -6,6 +6,9 @@ RESULTS_DIR=$2
 REF_FASTA=$3
 BAM_SUFFIX=$4
 SAMPLE=$5
+SCRIPT_DIR=$6
+FINAL_SNPS=$7
+FINAL_INDELS=$8
 
 echo -e "START: $(date)\nWGS WES Pipeline\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nResults dir: $RESULTS_DIR"
 cd $RESULTS_DIR
@@ -40,7 +43,26 @@ Circle-Map Realign -i ${SAMPLE}_sorted_circular_read_candidates${BAM_SUFFIX} \
     -qbam ${SAMPLE}_qname${BAM_SUFFIX} -sbam ${SAMPLE}_sorted${BAM_SUFFIX} \
     -fasta $REF_FASTA -o ${SAMPLE}_unknown_circle.bed
 echo "### Detect circular DNA ### - END: $(date)"
- 
+
+echo "### Parsing annotated variants that fall within circular regions ### - START: $(date)"
+if [ "$FINAL_SNPS" != "0" ]; then
+    if [ ! -f $FINAL_SNPS ]; then
+        echo "$FINAL_SNPS final SNPs file not found. Cannot parsed annotated variants from circular regions"
+    else
+        CIRCLE_SNPS=$(echo $FINAL_SNPS | sed "s/.tsv/circular.tsv/")
+        Rscript ${SCRIPT_DIR}/circle_map_variants.R $FINAL_SNPS ${SAMPLE}_unknown_circle.bed $CIRCLE_SNPS
+    fi
+fi
+if [ "$FINAL_INDELS" != "0" ]; then
+    if [ ! -f $FINAL_INDELS ]; then
+        echo "$FINAL_INDELS final indels file not found. Cannot parsed annotated variants from circular regions"
+    else
+        CIRCLE_INDELS=$(echo $FINAL_INDELS | sed "s/.tsv/circular.tsv/")
+        Rscript ${SCRIPT_DIR}/circle_map_variants.R $FINAL_SNPS ${SAMPLE}_unknown_circle.bed $CIRCLE_INDELS
+    fi
+fi
+echo "### Parsing annotated variants that fall within circular regions ### - END: $(date)"
+
 rm ${SAMPLE}_qname${BAM_SUFFIX} ${SAMPLE}_sorted${BAM_SUFFIX}
 rm ${SAMPLE}_circular_read_candidates${BAM_SUFFIX} ${SAMPLE}_sorted_circular_read_candidates${BAM_SUFFIX}
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
