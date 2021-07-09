@@ -78,7 +78,7 @@ while [ "$1" != "" ]; do
                                 ;;
         --circle_map )          PROGRAM="circle_map"
                                 ;;
-        --sig_profiler )        PROJECT="sig_profiler"
+        --sig_profiler )        PROGRAM="sig_profiler"
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
