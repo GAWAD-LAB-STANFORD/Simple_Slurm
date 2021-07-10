@@ -38,7 +38,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [ ! -z $PROJECT ]; then
+if [ -z $PROJECT ]; then
     PROJECT=$(echo $VCF | sed "s/.vcf.gz//" | sed "s/.merged//")
 fi
 if [ -z $RESULTS_DIR ]; then
@@ -77,14 +77,14 @@ if [ "$GENOME_VERSION" = "b37" ]; then
     OMNI_VCF="${REFERENCE_DIR}/1000G_omni2.5.b37.vcf.gz"
 fi
 
-if [ ! -f ${PROJECT}.merged.vcf.gz ]; then
-    echo "${PROJECT}.merged.vcf.gz does not exist. Exiting with code 1"
+if [ ! -f $VCF ]; then
+    echo "$VCF does not exist. Exiting with code 1"
     exit 1
 fi
 
 echo "### Running VQSR on SNPs and Indels ### - START: $(date)"
 gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" VariantRecalibrator \
-    -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal \
+    -V $VCF -O ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal \
     --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal.tranches \
     --resource:hapmap,known=false,training=true,truth=true,prior=15.0 $HAPMAP_VCF \
     --resource:omni,known=false,training=true,truth=true,prior=12.0 $OMNI_VCF \
@@ -94,7 +94,7 @@ gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" Variant
     --mode SNP -R $REF_FASTA -tranche $TRANCHE -tranche $TRANCHE -tranche $TRANCHE -tranche $TRANCHE \
     --max-gaussians 4 --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal_plots.R
 gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" VariantRecalibrator \
-    -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal \
+    -V $VCF -O ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal \
     --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal.tranches \
     --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
     --resource:mills,known=false,training=true,truth=true,prior=12.0 $MILLS_VCF \
@@ -105,11 +105,11 @@ echo "### Running VQSR on SNPs and Indels ### - END: $(date)"
 
 echo "### Applying VQSR to SNPs and Indels ### - START: $(date)"
 gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" ApplyVQSR \
-    -R $REF_FASTA -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.vcf.gz \
+    -R $REF_FASTA -V $VCF -O ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.vcf.gz \
     --ts-filter-level $TRANCHE --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal.tranches \
     --recal-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal -mode SNP
 gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" ApplyVQSR \
-    -R $REF_FASTA -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.indel_vqsr.vcf.gz \
+    -R $REF_FASTA -V $VCF -O ${PROJECT}.tranche_${TRANCHE}.merged.indel_vqsr.vcf.gz \
     --ts-filter-level $TRANCHE --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal.tranches \
     --recal-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal -mode INDEL
 echo "### Applying VQSR to SNPs and Indels ### - END: $(date)"
