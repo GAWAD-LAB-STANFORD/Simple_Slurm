@@ -41,14 +41,19 @@ Lorenz curve: \n\t\
         sh ${PIPELINE_DIR}/submit_job.sh --lorenz_curve --bam_dir /path/to/BAMs/ --project PTA_BAMs \n\n\
 Circle map: \n\t\
     Required: -b/--bam_dir <arg> \n\t\
-    Optional: --results_dir <arg> (default bam_dir), --ref_fasta <arg> (default hg38), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam), --final_snps <arg>, --final_indels <arg> \n\t\
+    Optional: --results_dir <arg> (default bam_dir), --b37/--hg19 (default hg38), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam), --final_snps <arg>, --final_indels <arg> \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --circle_map --bam_dir /path/to/BAMs/ \n\n\
 SigProfiler: \n\t\
     Required: --project <arg> and either --vcf <arg> or --tsv <arg> \n\t\
-    Optional: --results_dir (default is where --vcf or --tsv is located), --ref_fasta (default hg38) \n\t\
+    Optional: --results_dir (default is where --vcf or --tsv is located), --b37/--hg19 (default hg38) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --sig_profiler --project SigProfiler --vcf /path/to/my_variants.vcf.gz \n\n\
+Tranche filter: \n\t\
+    Required: --vcf <arg>, --tranche <arg> \n\t\
+    Optional: --results_dir (default is where --vcf is located), --project <arg>, --b37 (default hg38) \n\t\
+    Run like: \n\t\t\
+        sh ${PIPELINE_DIR}/submit_job.sh --tranche_filter --vcf /path/to/my_variants.vcf.gz --tranche 99.0 \n\n\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
@@ -79,6 +84,8 @@ while [ "$1" != "" ]; do
         --circle_map )          PROGRAM="circle_map"
                                 ;;
         --sig_profiler )        PROGRAM="sig_profiler"
+                                ;;
+        --tranche_filter )      PROGRAM="tranche_filter"
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
@@ -139,9 +146,6 @@ while [ "$1" != "" ]; do
         --mq )                  shift
                                 MQ=$1
                                 ;;
-        --ref_fasta )           shift
-                                REF_FASTA=$1
-                                ;;
         --final_snps )          shift
                                 FINAL_SNPS=$1
                                 ;;
@@ -153,6 +157,9 @@ while [ "$1" != "" ]; do
                                 ;;
         --tsv )                 shift
                                 TSV=$1
+                                ;;
+        --tranche )             shift
+                                TRANCHE=$1
                                 ;;
         --slurm )               shift
                                 SLURM_OPTIONS=${@:1}
@@ -374,8 +381,10 @@ elif [ $PROGRAM = "circle_map" ]; then
     if [ -z $BAM_REGEX ]; then
         BAM_REGEX=".*.bam"
     fi
-    if [ ! -z $REF_FASTA ]; then
-        OPTIONS+=( "--ref_fasta $REF_FASTA" )
+    if [ $GENOME_VERSION = "hg19" ]; then
+        OPTIONS+=( "--hg19" )
+    elif [ $GENOME_VERSION = "b37" ]; then
+        OPTIONS+=( "--b37" )
     fi
     if [ ! -z $RESULTS_DIR ]; then
         OPTIONS+=( "--results_dir $RESULTS_DIR" )
@@ -413,6 +422,12 @@ elif [ $PROGRAM = "sig_profiler" ]; then
         echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
         exit 1
     fi
+    if [ -z $RESULTS_DIR ]; then
+        RESULTS_DIR=$BAM_DIR
+        if [ ! -d $RESULTS_DIR ]; then
+            mkdir $RESULTS_DIR
+        fi
+    fi
     if [ ! -z $VCF ]; then
         OPTIONS+=( "--vcf $VCF" )
         if [ -z $RESULTS_DIR ]; then
@@ -425,11 +440,36 @@ elif [ $PROGRAM = "sig_profiler" ]; then
             RESULTS_DIR=$(dirname $TSV)
         fi
     fi
-    if [ ! -z $REF_FASTA ]; then
-        OPTIONS+=( "--ref_fasta $REF_FASTA" )
+    if [ -z $STD_ERR_OUT_DIR ]; then
+        STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
     fi
-    if [ ! -d $RESULTS_DIR ]; then
-        mkdir $RESULTS_DIR
+    if [ ! -d $STD_ERR_OUT_DIR ]; then
+        mkdir $STD_ERR_OUT_DIR
+    fi
+    if [ $GENOME_VERSION = "hg19" ]; then
+        OPTIONS+=( "--hg19" )
+    elif [ $GENOME_VERSION = "b37" ]; then
+        OPTIONS+=( "--b37" )
+    fi
+    sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
+        ${PIPELINE_DIR}/scripts/SigProfiler.sh --project $PROJECT \
+        --script_dir ${PIPELINE_DIR}/scripts/ ${OPTIONS[@]}
+elif [ $PROGRAM = "tranche_filter" ]; then
+    if [ -z $VCF ] || [ -z $TRANCHE ]; then
+        echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
+        exit 1
+    fi
+    if [ -z $RESULTS_DIR ]; then
+        RESULTS_DIR=$BAM_DIR
+        if [ ! -d $RESULTS_DIR ]; then
+            mkdir $RESULTS_DIR
+        fi
+    fi
+    if [ ! -z $VCF ]; then
+        OPTIONS+=( "--vcf $VCF" )
+        if [ -z $RESULTS_DIR ]; then
+            RESULTS_DIR=$(dirname $VCF)
+        fi
     fi
     if [ -z $STD_ERR_OUT_DIR ]; then
         STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
@@ -437,9 +477,12 @@ elif [ $PROGRAM = "sig_profiler" ]; then
     if [ ! -d $STD_ERR_OUT_DIR ]; then
         mkdir $STD_ERR_OUT_DIR
     fi
+    if [ $GENOME_VERSION = "b37" ]; then
+        OPTIONS+=( "--b37" )
+    fi
     sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
-        ${PIPELINE_DIR}/scripts/SigProfiler.sh --project $PROJECT --ref_fasta $REF_FASTA \
-        --script_dir ${PIPELINE_DIR}/scripts/ --results_dir $RESULTS_DIR ${OPTIONS[@]}
+        ${PIPELINE_DIR}/scripts/tranche_filter.sh --vcf $VCF --tranche $TRANCHE \
+        --script_dir ${PIPELINE_DIR}/scripts/ ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0

@@ -8,6 +8,7 @@
 START_TIME=$(date +%s)
 REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/Homo_sapiens_assembly38.fasta"
 TOOLS_DIR="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/"
+GENOME_VERSION="hg38"
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -15,16 +16,17 @@ while [ "$1" != "" ]; do
                             PROJECT=$1
                             ;;
         --vcf )             shift
-                            REF_FASTA=$1
+                            VCF=$1
                             ;;
         --tsv )             shift
-                            REF_FASTA=$1
+                            TSV=$1
                             ;;
         --results_dir )     shift
                             RESULTS_DIR=$1
                             ;;
-        --ref_fasta )       shift
-                            REF_FASTA=$1
+        --hg19 )            GENOME_VERSION="hg19"
+                            ;;
+        --b37 )             GENOME_VERSION="b37"
                             ;;
         --script_dir )      shift
                             SCRIPT_DIR=$1
@@ -38,8 +40,17 @@ if [ ! -z $VCF ]; then
     echo "VCF: $VCF"
     TSV=$(echo $VCF | sed "s/.gz//" | sed "s/.vcf/.tsv/")
 fi
-echo -e "TSV: $TSV\nResults dir: $RESULTS_DIR\nRef fasta: $REF_FASTA"
+if [ $GENOME_VERSION = "hg19" ]; then
+    REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg19/ucsc.hg19.fasta"
+elif [ $GENOME_VERSION = "b37" ]; then
+    REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_b37/human_g1k_v37.fasta"
+fi
+if [ -z $RESULTS_DIR ]; then
+    RESULTS_DIR=$(dirname $TSV)
+fi
 cd $RESULTS_DIR
+echo -e "TSV: $TSV\nResults dir: $RESULTS_DIR\nRef fasta: $REF_FASTA"
+
 
 ml R/4.0.2 java perl biology gatk bedtools samtools
 export R_LIBS="/home/groups/cgawad/R_libs"

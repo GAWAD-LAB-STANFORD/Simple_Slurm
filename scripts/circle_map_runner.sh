@@ -28,14 +28,15 @@ while [ "$1" != "" ]; do
         --bam_suffix )          shift
                                 BAM_SUFFIX=$1
                                 ;;
-        --ref_fasta )           shift
-                                REF_FASTA=$1
-                                ;;
         --final_snps )          shift
                                 FINAL_SNPS=$1
                                 ;;
         --final_indels )        shift
                                 FINAL_INDELS=$1
+                                ;;
+        --hg19 )                GENOME_VERSION="hg19"
+                                ;;
+        --b37 )                 GENOME_VERSION="b37"
                                 ;;
     esac
     shift
@@ -45,6 +46,11 @@ SAMPLE_ARRAY=( $(echo $SAMPLES_STRING | sed 's/:/ /g') )
 SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
+fi
+if [ $GENOME_VERSION = "hg19" ]; then
+    REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg19/ucsc.hg19.fasta"
+elif [ $GENOME_VERSION = "b37" ]; then
+    REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_b37/human_g1k_v37.fasta"
 fi
 
 srun --time=3-00:00:00 --mem=64G --partition=cgawad --pty bash ${SCRIPT_DIR}/circle_map.sh $BAM_DIR $RESULTS_DIR $REF_FASTA $BAM_SUFFIX $SAMPLE $SCRIPT_DIR $FINAL_SNPS $FINAL_INDELS
