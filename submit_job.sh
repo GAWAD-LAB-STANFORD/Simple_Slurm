@@ -422,8 +422,8 @@ elif [ $PROGRAM = "sig_profiler" ]; then
         echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
         exit 1
     fi
-    if [ -z $RESULTS_DIR ]; then
-        RESULTS_DIR=$BAM_DIR
+    if [ ! -z $RESULTS_DIR ]; then
+        OPTIONS+=( "--results_dir $RESULTS_DIR" )
         if [ ! -d $RESULTS_DIR ]; then
             mkdir $RESULTS_DIR
         fi
@@ -459,8 +459,8 @@ elif [ $PROGRAM = "tranche_filter" ]; then
         echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
         exit 1
     fi
-    if [ -z $RESULTS_DIR ]; then
-        RESULTS_DIR=$BAM_DIR
+    if [ ! -z $RESULTS_DIR ]; then
+        OPTIONS+=( "--results_dir $RESULTS_DIR" )
         if [ ! -d $RESULTS_DIR ]; then
             mkdir $RESULTS_DIR
         fi
