@@ -451,7 +451,7 @@ elif [ $PROGRAM = "sig_profiler" ]; then
     elif [ $GENOME_VERSION = "b37" ]; then
         OPTIONS+=( "--b37" )
     fi
-    sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
+    sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%x.err -o ${STD_ERR_OUT_DIR}/%A_%x.out \
         ${PIPELINE_DIR}/scripts/SigProfiler.sh --project $PROJECT \
         --script_dir ${PIPELINE_DIR}/scripts/ ${OPTIONS[@]}
 elif [ $PROGRAM = "tranche_filter" ]; then
@@ -480,7 +480,7 @@ elif [ $PROGRAM = "tranche_filter" ]; then
     if [ $GENOME_VERSION = "b37" ]; then
         OPTIONS+=( "--b37" )
     fi
-    sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%a_%x.err -o ${STD_ERR_OUT_DIR}/%A_%a_%x.out \
+    sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%x.err -o ${STD_ERR_OUT_DIR}/%A_%x.out \
         ${PIPELINE_DIR}/scripts/tranche_filter.sh --vcf $VCF --tranche $TRANCHE \
         --script_dir ${PIPELINE_DIR}/scripts/ ${OPTIONS[@]}
 else
