@@ -24,10 +24,10 @@ while [ "$1" != "" ]; do
                                 PROJECT=$1
                                 ;;
         --tranche )             shift
-                                tranche=$1
+                                TRANCHE=$1
                                 ;;
         --script_dir )          shift
-                                script_dir=$1
+                                SCRIPT_DIR=$1
                                 ;;
         --results_dir )         shift
                                 RESULTS_DIR=$1
