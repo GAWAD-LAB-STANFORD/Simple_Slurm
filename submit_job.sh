@@ -51,7 +51,7 @@ SigProfiler: \n\t\
         sh ${PIPELINE_DIR}/submit_job.sh --sig_profiler --project SigProfiler --vcf /path/to/my_variants.vcf.gz \n\n\
 Tranche filter: \n\t\
     Required: --vcf <arg>, --tranche <arg> \n\t\
-    Optional: --results_dir (default is where --vcf is located), --project <arg>, --b37 (default hg38) \n\t\
+    Optional: --exome, --results_dir (default is where --vcf is located), --project <arg>, --b37 (default hg38) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --tranche_filter --vcf /path/to/my_variants.vcf.gz --tranche 99.0 \n\n\
 For more information, read the README.md"
@@ -62,6 +62,7 @@ GENOME_VERSION="hg38"
 PROGRAM="none"
 COMBINE_BLACKLISTS=0
 KB_BIN_SIZE="500"
+EXOME=0
 while [ "$1" != "" ]; do
     case $1 in
         -h | --help )           echo -e $HELP
@@ -160,6 +161,8 @@ while [ "$1" != "" ]; do
                                 ;;
         --tranche )             shift
                                 TRANCHE=$1
+                                ;;
+        --exome )               EXOME=1
                                 ;;
         --slurm )               shift
                                 SLURM_OPTIONS=${@:1}
@@ -479,6 +482,9 @@ elif [ $PROGRAM = "tranche_filter" ]; then
     fi
     if [ $GENOME_VERSION = "b37" ]; then
         OPTIONS+=( "--b37" )
+    fi
+    if [ $EXOME -eq 1 ]; then
+        OPTIONS+=( "--exome" )
     fi
     sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%x.err -o ${STD_ERR_OUT_DIR}/%A_%x.out \
         ${PIPELINE_DIR}/scripts/tranche_filter.sh --vcf $VCF --tranche $TRANCHE \
