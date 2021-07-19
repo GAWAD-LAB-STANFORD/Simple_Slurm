@@ -10,7 +10,7 @@ SCRIPT_DIR=$6
 FINAL_SNPS=$7
 FINAL_INDELS=$8
 
-echo -e "START: $(date)\nWGS WES Pipeline\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nResults dir: $RESULTS_DIR"
+echo -e "START: $(date)\nSlurm ID: $SLURM_ARRAY_TASK_ID\nSample: $SAMPLE\nResults dir: $RESULTS_DIR\nRef fasta: $REF_FASTA"
 cd $RESULTS_DIR
 
 ml biology samtools bwa bedtools
