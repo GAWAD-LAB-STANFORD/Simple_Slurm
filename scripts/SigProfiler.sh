@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#SBATCH --job-name=circle_map
+#SBATCH --job-name=sig_profiler
 #SBATCH --mem=64G
 #SBATCH --time=1-00:00:00
 #SBATCH --partition=cgawad

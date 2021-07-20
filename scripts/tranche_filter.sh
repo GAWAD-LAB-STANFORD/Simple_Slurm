@@ -2,7 +2,6 @@
 #
 #SBATCH --job-name=tranche_filter
 #SBATCH --mem=64G
-#SBATCH --cpus-per-task=4
 #SBATCH --time=4-00:00:00
 #SBATCH --partition=cgawad
 

@@ -2,7 +2,6 @@
 #
 #SBATCH --job-name=lorenz_curve
 #SBATCH --mem=15G
-#SBATCH --cpus-per-task=1
 #SBATCH --time=24:00:00
 #SBATCH --partition=cgawad
 

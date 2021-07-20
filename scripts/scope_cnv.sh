@@ -2,7 +2,6 @@
 #
 #SBATCH --job-name=scope_cnv
 #SBATCH --mem=32G
-#SBATCH --cpus-per-task=2
 #SBATCH --time=3-00:00:00
 #SBATCH --partition=cgawad
 START_TIME=$(date +%s)

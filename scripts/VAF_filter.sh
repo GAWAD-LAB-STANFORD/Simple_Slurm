@@ -2,7 +2,6 @@
 #
 #SBATCH --job-name=VAF_filter
 #SBATCH --mem=32G
-#SBATCH --cpus-per-task=2
 #SBATCH --time=10:00:00
 #SBATCH --partition=cgawad
 
