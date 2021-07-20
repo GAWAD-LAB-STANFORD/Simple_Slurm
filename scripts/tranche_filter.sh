@@ -48,6 +48,9 @@ if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$(dirname $VCF)
 fi
 echo -e "START: $(date)\nVCF: $VCF\nProject: $PROJECT\nTranche: $TRANCHE\nResults dir: $RESULTS_DIR"
+if [ TARGETED -eq 1 ]; then
+    echo "Exome mode specified"
+fi
 cd $RESULTS_DIR
 
 ml R/4.0.2 java perl biology gatk bedtools samtools
