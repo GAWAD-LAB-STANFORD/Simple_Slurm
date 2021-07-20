@@ -65,11 +65,12 @@ export PATH=/home/groups/cgawad/python_libs/bin:$PATH
 ANNOVAR_GENOME_VERSION="hg38"
 REFERENCE_DIR="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg38"
 REF_FASTA="${REFERENCE_DIR}/Homo_sapiens_assembly38.fasta"
-DBSNP_VCF="${REFERENCE_DIR}/Homo_sapiens_assembly38.dbsnp138.vcf.gz"
 HAPMAP_VCF="${REFERENCE_DIR}/hapmap_3.3.hg38.vcf.gz"
-MILLS_VCF="${REFERENCE_DIR}/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz"
-ONEKG_VCF="${REFERENCE_DIR}/1000G_phase1.snps.high_confidence.hg38.vcf.gz"
 OMNI_VCF="${REFERENCE_DIR}/1000G_omni2.5.hg38.vcf.gz"
+ONEKG_VCF="${REFERENCE_DIR}/1000G_phase1.snps.high_confidence.hg38.vcf.gz"
+DBSNP_VCF="${REFERENCE_DIR}/Homo_sapiens_assembly38.dbsnp138.vcf.gz"
+MILLS_VCF="${REFERENCE_DIR}/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz"
+AXIOM_VCF="${REFERENCE_DIR}/Axiom_Exome_Plus.genotypes.all_populations.poly.hg38.vcf.gz"
 
 # hg19 version b37 reference files
 if [ "$GENOME_VERSION" = "b37" ]; then
@@ -81,6 +82,7 @@ if [ "$GENOME_VERSION" = "b37" ]; then
     MILLS_VCF="${REFERENCE_DIR}/Mills_and_1000G_gold_standard.indels.b37.vcf.gz"
     ONEKG_VCF="${REFERENCE_DIR}/1000G_phase1.snps.high_confidence.b37.vcf.gz"
     OMNI_VCF="${REFERENCE_DIR}/1000G_omni2.5.b37.vcf.gz"
+    AXIOM_VCF="${REFERENCE_DIR}/Axiom_Exome_Plus.genotypes.all_populations.poly.vcf.gz"
 fi
 
 if [ ! -f $VCF ]; then
@@ -94,18 +96,19 @@ if [ $TARGETED -eq 1 ]; then
         --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal.tranches \
         --resource:hapmap,known=false,training=true,truth=true,prior=15.0 $HAPMAP_VCF \
         --resource:omni,known=false,training=true,truth=true,prior=12.0 $OMNI_VCF \
-        --resource:1000G,known=false,training=true,truth=false,prior=10.0 $ONEKG_VCF \
-        --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
+        --resource:1000G,known=false,training=true,truth=true,prior=10.0 $ONEKG_VCF \
+        --resource:dbsnp,known=true,training=false,truth=false,prior=7.0 $DBSNP_VCF \
         -an QD -an FS -an SOR -an MQ -an MQRankSum -an ReadPosRankSum --mode SNP \
         -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
         -tranche 99.6 -tranche 99.5 -tranche 99.4 -tranche 99.3 \
         -tranche 99.0 -tranche 98.0 -tranche 97.0 -tranche 90.0 -tranche $TRANCHE \
-        --max-gaussians 4 -R $REF_FASTA --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal_plots.R
+        --max-gaussians 6 -R $REF_FASTA --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal_plots.R
     gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" VariantRecalibrator \
         -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal \
         --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal.tranches \
-        --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
         --resource:mills,known=false,training=true,truth=true,prior=12.0 $MILLS_VCF \
+        --resource:axiomPoly,known=false,training=true,truth=false,prior=10 $AXIOM_VCF
+        --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
         -an QD -an FS -an SOR -an ReadPosRankSum -an MQRankSum --mode INDEL \
         -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
         -tranche 99.6 -tranche 99.5 -tranche 99.4 -tranche 99.3 \
@@ -120,18 +123,19 @@ else
         --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal.tranches \
         --resource:hapmap,known=false,training=true,truth=true,prior=15.0 $HAPMAP_VCF \
         --resource:omni,known=false,training=true,truth=true,prior=12.0 $OMNI_VCF \
-        --resource:1000G,known=false,training=true,truth=false,prior=10.0 $ONEKG_VCF \
-        --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
+        --resource:1000G,known=false,training=true,truth=true,prior=10.0 $ONEKG_VCF \
+        --resource:dbsnp,known=true,training=false,truth=false,prior=7.0 $DBSNP_VCF \
         -an QD -an DP -an FS -an SOR -an MQ -an MQRankSum -an ReadPosRankSum --mode SNP \
         -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
         -tranche 99.6 -tranche 99.5 -tranche 99.4 -tranche 99.3 \
         -tranche 99.0 -tranche 98.0 -tranche 97.0 -tranche 90.0 -tranche $TRANCHE \
-        --max-gaussians 4 -R $REF_FASTA --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal_plots.RR
+        --max-gaussians 6 -R $REF_FASTA --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal_plots.RR
     gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" VariantRecalibrator \
         -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal \
         --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal.tranches \
-        --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
         --resource:mills,known=false,training=true,truth=true,prior=12.0 $MILLS_VCF \
+        --resource:axiomPoly,known=false,training=true,truth=false,prior=10 $AXIOM_VCF
+        --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
         -an QD -an DP -an FS -an SOR -an ReadPosRankSum -an MQRankSum --mode INDEL \
         -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
         -tranche 99.6 -tranche 99.5 -tranche 99.4 -tranche 99.3 \
@@ -223,7 +227,7 @@ if [ ! -f ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.snp_only.${ANNOVAR_GENOM
     echo "Final file ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.snp_only.${ANNOVAR_GENOME_VERSION}_multianno.final.tsv not found. Exiting with code 1"
     exit 1
 fi
-rm ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal.idx 
-rm ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal.idx
+# rm ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal.idx 
+# rm ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal.idx
 rm ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.vcf.gz* ${PROJECT}.tranche_${TRANCHE}.merged.indel_vqsr.vcf.gz*
 rm ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.snp_only.avinput ${PROJECT}.tranche_${TRANCHE}.merged.indel_vqsr.indel_only.avinput
