@@ -128,7 +128,7 @@ else
         -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
         -tranche 99.6 -tranche 99.5 -tranche 99.4 -tranche 99.3 \
         -tranche 99.0 -tranche 98.0 -tranche 97.0 -tranche 90.0 -tranche $TRANCHE \
-        --max-gaussians 6 -R $REF_FASTA --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal_plots.RR
+        --max-gaussians 6 -R $REF_FASTA --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal_plots.R
     gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" VariantRecalibrator \
         -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal \
         --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal.tranches \
@@ -191,10 +191,10 @@ sed -i "s/#CHROM/CHROM/" ${PROJECT}.tranche_${TRANCHE}.merged.indel_vqsr.indel_o
 echo "### Convert annotated VCF to TSV ### - END: $(date)"
 
 echo "### Recalculate VAF ### - START: $(date)"
-python3 ${SCRIPT_DIR}/split_add_VAF.py \
+python3 -u ${SCRIPT_DIR}/split_add_VAF.py \
     -i ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.snp_only.${ANNOVAR_GENOME_VERSION}_multianno.temp.tsv \
     -o ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.snp_only.${ANNOVAR_GENOME_VERSION}_multianno.final.tsv
-python3 ${SCRIPT_DIR}/split_add_VAF.py \
+python3 -u ${SCRIPT_DIR}/split_add_VAF.py \
     -i ${PROJECT}.tranche_${TRANCHE}.merged.indel_vqsr.indel_only.${ANNOVAR_GENOME_VERSION}_multianno.temp.tsv \
     -o ${PROJECT}.tranche_${TRANCHE}.merged.indel_vqsr.indel_only.${ANNOVAR_GENOME_VERSION}_multianno.final.tsv
 rm ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.snp_only.${ANNOVAR_GENOME_VERSION}_multianno.temp.tsv
