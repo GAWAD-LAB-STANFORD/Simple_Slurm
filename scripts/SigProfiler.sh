@@ -6,7 +6,7 @@
 #SBATCH --partition=cgawad
 
 START_TIME=$(date +%s)
-REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/Homo_sapiens_assembly38.fasta"
+REF_FASTA="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg38/Homo_sapiens_assembly38.fasta"
 TOOLS_DIR="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/"
 GENOME_VERSION="hg38"
 
@@ -85,13 +85,13 @@ echo "Subsequent base obtained"
 echo "### Obtaining previous and subsequent reference base ### - END: $(date)"
 
 echo "### Reformatting into trinucleotide context ### - START: $(date)"
-Rscript SigProfiler_2_Trinucleotide_Reformat.R ${PROJECT}.temp_bedtools_reformat.tsv \
+Rscript ${SCRIPT_DIR}/SigProfiler_2_Trinucleotide_Reformat.R ${PROJECT}.temp_bedtools_reformat.tsv \
     ${PROJECT}.temp_bedtools_before_output.tsv ${PROJECT}.temp_bedtools_after_output.tsv \
     ${PROJECT}.trinucleotide.tsv ${PROJECT}.temp_sigprofiler_input.tsv ${SCRIPT_DIR}/Mutation_Types.tsv
 echo "### Reformatting into trinucleotide context ### - END: $(date)"
 
 echo "### Obtaining mutational signature with SigProfiler ### - START: $(date)"
-python3 -u SigProfiler_3_Extractor.py ${PROJECT}.temp_sigprofiler_input.tsv \
+python3 -u ${SCRIPT_DIR}/SigProfiler_3_Extractor.py ${PROJECT}.temp_sigprofiler_input.tsv \
     ${PROJECT}_SigProfiler_Results $RESULTS_DIR
 echo "### Obtaining mutational signature with SigProfiler ### - END: $(date)"
 
