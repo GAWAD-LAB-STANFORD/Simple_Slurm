@@ -106,7 +106,7 @@ if [ $TARGETED -eq 1 ]; then
         -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal \
         --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal.tranches \
         --resource:mills,known=false,training=true,truth=true,prior=12.0 $MILLS_VCF \
-        --resource:axiomPoly,known=false,training=true,truth=false,prior=10 $AXIOM_VCF
+        --resource:axiomPoly,known=false,training=true,truth=false,prior=10 $AXIOM_VCF \
         --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
         -an QD -an FS -an SOR -an ReadPosRankSum -an MQRankSum --mode INDEL \
         -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
@@ -133,7 +133,7 @@ else
         -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal \
         --tranches-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal.tranches \
         --resource:mills,known=false,training=true,truth=true,prior=12.0 $MILLS_VCF \
-        --resource:axiomPoly,known=false,training=true,truth=false,prior=10 $AXIOM_VCF
+        --resource:axiomPoly,known=false,training=true,truth=false,prior=10 $AXIOM_VCF \
         --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
         -an QD -an DP -an FS -an SOR -an ReadPosRankSum -an MQRankSum --mode INDEL \
         -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
