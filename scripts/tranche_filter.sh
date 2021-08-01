@@ -204,21 +204,29 @@ echo "### Recalculate VAF ### - END: $(date)"
 echo "### Computing mutational signature with SigProfiler ### - START: $(date)"
 cut -f 1,2,4,5 ${PROJECT}.tranche_${TRANCHE}.merged.snp_vqsr.snp_only.${ANNOVAR_GENOME_VERSION}_multianno.final.tsv \
     | uniq > ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_reformat.tsv
-Rscript ${SCRIPT_DIR}/SigProfiler_1_Bedtools_Reformat.R ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_reformat.tsv \
+Rscript ${SCRIPT_DIR}/SigProfiler_1_Bedtools_Reformat.R \
+    ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_reformat.tsv \
     ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_input.tsv ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_input.tsv
-bedtools getfasta -fi $REF_FASTA -bed ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_input.tsv \
+bedtools getfasta -fi $REF_FASTA \
+    -bed ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_input.tsv \
     -bedOut > ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_output.tsv
-bedtools getfasta -fi $REF_FASTA -bed ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_input.tsv \
+bedtools getfasta -fi $REF_FASTA \
+    -bed ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_input.tsv \
     -bedOut > ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_output.tsv
-Rscript ${SCRIPT_DIR}/SigProfiler_2_Trinucleotide_Reformat.R ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_reformat.tsv \
-    ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_output.tsv ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_output.tsv \
-    ${PROJECT}.tranche_${TRANCHE}.temp_trinucleotide.tsv ${SCRIPT_DIR}/Mutation_Types.tsv
-python3 -u ${SCRIPT_DIR}/SigProfiler_3_Extractor.py ${PROJECT}.tranche_${TRANCHE}.temp_trinucleotide.tsv \
+Rscript ${SCRIPT_DIR}/SigProfiler_2_Trinucleotide_Reformat.R \
+    ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_reformat.tsv \
+    ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_output.tsv \
+    ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_output.tsv \
+    ${PROJECT}.tranche_${TRANCHE}.trinucleotide.tsv \
+    ${PROJECT}.tranche_${TRANCHE}.temp_sigprofiler_input.tsv \
+    ${SCRIPT_DIR}/Mutation_Types.tsv
+python3 -u ${SCRIPT_DIR}/SigProfiler_3_Extractor.py \
+    ${PROJECT}.tranche_${TRANCHE}.trinucleotide.tsv \
     ${PROJECT}.tranche_${TRANCHE}_SigProfiler_Results $RESULTS_DIR
 rm ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_reformat.tsv 
 rm ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_input.tsv ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_input.tsv 
 rm ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_output.tsv ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_output.tsv
-rm ${PROJECT}.tranche_${TRANCHE}.temp_trinucleotide.tsv
+rm ${PROJECT}.tranche_${TRANCHE}.temp_sigprofiler_input.tsv
 echo "### Computing mutational signature with SigProfiler ### - END: $(date)"
 
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
