@@ -221,7 +221,7 @@ Rscript ${SCRIPT_DIR}/SigProfiler_2_Trinucleotide_Reformat.R \
     ${PROJECT}.tranche_${TRANCHE}.temp_sigprofiler_input.tsv \
     ${SCRIPT_DIR}/Mutation_Types.tsv
 python3 -u ${SCRIPT_DIR}/SigProfiler_3_Extractor.py \
-    ${PROJECT}.tranche_${TRANCHE}.trinucleotide.tsv \
+    ${PROJECT}.tranche_${TRANCHE}.temp_sigprofiler_input.tsv \
     ${PROJECT}.tranche_${TRANCHE}_SigProfiler_Results $RESULTS_DIR
 rm ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_reformat.tsv 
 rm ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_input.tsv ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_input.tsv 
