@@ -87,16 +87,19 @@ echo "### Obtaining previous and subsequent reference base ### - END: $(date)"
 echo "### Reformatting into trinucleotide context ### - START: $(date)"
 Rscript ${SCRIPT_DIR}/SigProfiler_2_Trinucleotide_Reformat.R ${PROJECT}.temp_bedtools_reformat.tsv \
     ${PROJECT}.temp_bedtools_before_output.tsv ${PROJECT}.temp_bedtools_after_output.tsv \
-    ${PROJECT}.trinucleotide.tsv ${PROJECT}.temp_sigprofiler_input.tsv ${SCRIPT_DIR}/Mutation_Types.tsv
+    ${PROJECT}.trinucleotide.tsv ${PROJECT}.sigprofiler_input.tsv ${SCRIPT_DIR}/Mutation_Types.tsv
 echo "### Reformatting into trinucleotide context ### - END: $(date)"
 
-echo "### Obtaining mutational signature with SigProfiler ### - START: $(date)"
-python3 -u ${SCRIPT_DIR}/SigProfiler_3_Extractor.py ${PROJECT}.temp_sigprofiler_input.tsv \
-    ${PROJECT}_SigProfiler_Results $RESULTS_DIR
-echo "### Obtaining mutational signature with SigProfiler ### - END: $(date)"
+echo "You'll need to run SigProfiler manually on your own computer until the SigProfiler developers can fix the multiprocessing issue"
+echo "Here's a command you can use manually:"
+echo -e "\tpython3 -u SigProfiler_3_Extractor.py ${PROJECT}.sigprofiler_input.tsv ${PROJECT}_SigProfiler_Results /full/path/to/results/dir/"
+# echo "### Obtaining mutational signature with SigProfiler ### - START: $(date)"
+# python3 -u ${SCRIPT_DIR}/SigProfiler_3_Extractor.py ${PROJECT}.sigprofiler_input.tsv \
+#     ${PROJECT}_SigProfiler_Results $RESULTS_DIR
+# echo "### Obtaining mutational signature with SigProfiler ### - END: $(date)"
 
 rm ${PROJECT}.temp_bedtools_reformat.tsv 
 rm ${PROJECT}.temp_bedtools_before_input.tsv ${PROJECT}.temp_bedtools_after_input.tsv 
 rm ${PROJECT}.temp_bedtools_before_output.tsv ${PROJECT}.temp_bedtools_after_output.tsv
-rm ${PROJECT}.temp_sigprofiler_input.tsv
+# rm ${PROJECT}.sigprofiler_input.tsv
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
