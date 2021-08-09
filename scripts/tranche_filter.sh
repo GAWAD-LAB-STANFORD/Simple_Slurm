@@ -221,16 +221,13 @@ Rscript ${SCRIPT_DIR}/SigProfiler_2_Trinucleotide_Reformat.R \
     ${PROJECT}.tranche_${TRANCHE}.temp_trinucleotide.tsv \
     ${PROJECT}.tranche_${TRANCHE}.sigprofiler_input.tsv \
     ${SCRIPT_DIR}/Mutation_Types.tsv
-echo "You'll need to run SigProfiler manually on your own computer until the SigProfiler developers can fix the multiprocessing issue"
-echo "Here's a command you can use manually:"
-echo -e "\tpython3 -u SigProfiler_3_Extractor.py ${PROJECT}.tranche_${TRANCHE}.sigprofiler_input.tsv ${PROJECT}.tranche_${TRANCHE}_SigProfiler_Results /full/path/to/results/dir/"
-# python3 -u ${SCRIPT_DIR}/SigProfiler_3_Extractor.py \
-#     ${PROJECT}.tranche_${TRANCHE}.sigprofiler_input.tsv \
-#     ${PROJECT}.tranche_${TRANCHE}_SigProfiler_Results $RESULTS_DIR
+python3 -u ${SCRIPT_DIR}/SigProfiler_3_Extractor.py \
+    ${PROJECT}.tranche_${TRANCHE}.sigprofiler_input.tsv \
+    ${PROJECT}.tranche_${TRANCHE}_SigProfiler_Results $RESULTS_DIR
 rm ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_reformat.tsv 
 rm ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_input.tsv ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_input.tsv 
 rm ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_before_output.tsv ${PROJECT}.tranche_${TRANCHE}.temp_bedtools_after_output.tsv
-# rm ${PROJECT}.tranche_${TRANCHE}.sigprofiler_input.tsv
+rm ${PROJECT}.tranche_${TRANCHE}.sigprofiler_input.tsv
 echo "### Computing mutational signature with SigProfiler ### - END: $(date)"
 
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
