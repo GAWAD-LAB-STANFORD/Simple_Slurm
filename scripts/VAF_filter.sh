@@ -68,7 +68,7 @@ fi
 
 ml R/4.0.2 python/3.6.1
 export PYTHONPATH=/home/groups/cgawad/python_libs/lib/python3.6/site-packages:$PYTHONPATH
-export R_LIBS="/home/groups/cgawad/R_libs"
+export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 echo "Converting VCF to TSV - $(date)"
 python3 /oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/vcf2tsv/vcf2tsv.py \

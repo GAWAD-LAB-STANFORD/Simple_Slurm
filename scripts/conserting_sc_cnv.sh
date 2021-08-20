@@ -33,7 +33,7 @@ while [ "$1" != "" ]; do
 done
 
 ml perl R/4.0.2 biology samtools bedtools
-export R_LIBS="/home/groups/cgawad/R_libs"
+export R_LIBS="/home/groups/cgawad/R_LIBS"
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi

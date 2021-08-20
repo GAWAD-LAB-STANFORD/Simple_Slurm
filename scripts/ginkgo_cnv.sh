@@ -52,7 +52,7 @@ fi
 cd $GINKGO_DIR
 
 ml php R/4.0.2 biology bedtools samtools
-export R_LIBS="/home/groups/cgawad/R_libs"
+export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
 echo -e "Number of samples: ${#SAMPLE_ARRAY[@]}\nSamples: ${SAMPLE_ARRAY[@]}"

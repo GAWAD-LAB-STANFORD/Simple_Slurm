@@ -53,7 +53,7 @@ echo -e "TSV: $TSV\nResults dir: $RESULTS_DIR\nRef fasta: $REF_FASTA"
 
 
 ml R/4.0.2 java perl biology gatk bedtools samtools
-export R_LIBS="/home/groups/cgawad/R_libs"
+export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 ml python/3.6.1
 export PYTHONPATH=/home/groups/cgawad/python_libs/lib/python3.6/site-packages:$PYTHONPATH
