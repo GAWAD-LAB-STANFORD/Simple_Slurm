@@ -57,7 +57,7 @@ if [ $GENOME_VERSION = "b37" ]; then
     CONTROL_SUFFIX=".25M.marked.bam"
 else
     HG38_MAPP_GC_DIR="/oak/stanford/groups/cgawad/Reference_Files/SCOPE_hg38_mapp_gc_info/"
-    CONTROL_DIR="/oak/stanford/groups/cgawad/Reference_Files/T1200_hg38_BAMs/"
+    CONTROL_DIR="/oak/stanford/groups/cgawad/Reference_Files/T1200_hg38_10M_BAMs/"
     CONTROL_REGEX="T1200-..10M.bqsr.marked.bam"
     CONTROL_SUFFIX=".10M.bqsr.marked.bam"
 fi
