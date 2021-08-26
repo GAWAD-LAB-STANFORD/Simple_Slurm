@@ -2,7 +2,7 @@
 #
 #SBATCH --job-name=ginkgo_cnv
 #SBATCH --mem=15G
-#SBATCH --time=6:00:00
+#SBATCH --time=4-00:00:00
 #SBATCH --partition=cgawad
 
 START_TIME=$(date +%s)
