@@ -7,8 +7,8 @@
 
 START_TIME=$(date +%s)
 GINKGO_DIR="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/ginkgo/"
-FULL_WORK_DIR="${GINKGO_DIR}/uploads/$(date '+%Y-%m-%d_%H-%M-%S')"
-WORK_DIR="$(basename $FULL_WORK_DIR)"
+WORK_DIR=$(date '+%Y-%m-%d_%H-%M-%S')
+FULL_WORK_DIR="${GINKGO_DIR}/uploads/${WORK_DIR}"
 BAM_REGEX=".*.bam"
 BAM_SUFFIX=".bam"
 KB_BIN_SIZE="500"
@@ -66,7 +66,7 @@ for SAMPLE in ${SAMPLE_ARRAY[@]}; do
     echo "Done preparing $SAMPLE"
 done
 
-cp ${GINKGO_DIR}/config.txt ${FULL_WORK_DIR}/config
+cp config.txt ${FULL_WORK_DIR}/config
 sed -i "s/variable_500000_76_bwa/variable_${KB_BIN_SIZE}000_76_bwa/" ${FULL_WORK_DIR}/config
 if [ $GROUP_SEGMENTATION -eq 1 ]; then
     sed -i "s/segMeth=0/segMeth=1/" ${FULL_WORK_DIR}/config
