@@ -82,6 +82,6 @@ for SAMPLE in ${SAMPLE_ARRAY[@]}; do
     rm ${FULL_WORK_DIR}/${SAMPLE}.bed.gz
 done
 
+mkdir -p $RESULTS_DIR
 mv ${FULL_WORK_DIR}/* ${RESULTS_DIR}/
-
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
