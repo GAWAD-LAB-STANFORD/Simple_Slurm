@@ -54,6 +54,11 @@ Tranche filter: \n\t\
     Optional: --exome, --results_dir (default is where --vcf is located), --project <arg>, --b37 (default hg38) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --tranche_filter --vcf /path/to/my_variants.vcf.gz --tranche 99.0 \n\n\
+Scan2: \n\t\
+    Required: --bam_dir <arg>, --project <arg> \n\t\
+    Optional: --results_dir (default bam_dir), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam), --b37 (default b37 but will be hg38 in the future) \n\t\
+    Run like: \n\t\t\
+        sh ${PIPELINE_DIR}/submit_job.sh --scan2 --bam_dir /path/to/BAMs/ --project Scan2_Analysis \n\n\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
@@ -87,6 +92,8 @@ while [ "$1" != "" ]; do
         --sig_profiler )        PROGRAM="sig_profiler"
                                 ;;
         --tranche_filter )      PROGRAM="tranche_filter"
+                                ;;
+        --scan2 )               PROGRAM="scan2"
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
@@ -489,6 +496,45 @@ elif [ $PROGRAM = "tranche_filter" ]; then
     sbatch ${SLURM_OPTIONS[@]} -e ${STD_ERR_OUT_DIR}/%A_%x.err -o ${STD_ERR_OUT_DIR}/%A_%x.out \
         ${PIPELINE_DIR}/scripts/tranche_filter.sh --vcf $VCF --tranche $TRANCHE \
         --script_dir ${PIPELINE_DIR}/scripts/ ${OPTIONS[@]}
+elif [ $PROGRAM = "scan2" ]; then
+    if [ -z $BAM_DIR ] || [ -z $PROJECT ]; then
+        echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
+        exit 1
+    fi
+    if [ ! -z $BAM_SUFFIX ]; then
+        OPTIONS+=( "--bam_suffix $BAM_SUFFIX" )
+    else
+        BAM_SUFFIX=".bam"
+    fi
+    if [ ! -z $BAM_REGEX ]; then
+        OPTIONS+=( "--bam_regex $BAM_REGEX" )
+    else
+        BAM_REGEX=".*.bam"
+    fi
+    GENOME_VERSION="b37"
+    if [ $GENOME_VERSION = "b37" ]; then
+        OPTIONS+=( "--b37" )
+    fi
+    if [ ! -z $RESULTS_DIR ]; then
+        OPTIONS+=( "--results_dir $RESULTS_DIR" )
+    else
+        RESULTS_DIR=$BAM_DIR
+    fi
+    if [ ! -d $RESULTS_DIR ]; then
+        mkdir $RESULTS_DIR
+    fi
+    if [ -z $STD_ERR_OUT_DIR ]; then
+        STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
+    fi
+    if [ ! -d $STD_ERR_OUT_DIR ]; then
+        mkdir $STD_ERR_OUT_DIR
+    fi
+    SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
+    JOB_COUNT=${#SAMPLE_ARRAY[@]}
+    sbatch -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
+        --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/Scan2.sh \
+        --b37 --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $RESULTS_DIR \
+        --bam_suffix $BAM_SUFFIX --project $PROJECT ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0
