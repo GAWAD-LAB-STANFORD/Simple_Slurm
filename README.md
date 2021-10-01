@@ -2,7 +2,6 @@
 
 - [Purpose](#purpose)
 - [How To Run](#how-to-run)
-- [What It Does Exactly](#what-it-does-exactly)
 - [TODO and Notes](#todo-and-notes)
 
 ## Purpose
@@ -20,16 +19,6 @@
 - You can have '/' or nothing at the end of a directory path, either is fine:
     - -r /home/groups/cgawad/results/
     - -r /home/groups/cgawad/results
-
-## What It Does Exactly
-- Currently supported jobs
-    - SCOPE CNV analysis
-    - Conserting SC CNV analysis
-    - Ginkgo CNV analysis
-    - Demultiplexer
-        - Includes initial library concentration correction if Sample Sheet has
-            - Desired_Cluster_Density column with at least one entry
-            - Initial_Concentration column with as many entries as samples
-    - Variant Allele Frequency filter
-    - Monovar Variant Caller
-    - Lorenz Curve and Gini Index
+	
+## TODO and Notes
+- Add HGMD simple slurm
