@@ -63,7 +63,7 @@ Variant Class: \n\t\
 	Required: --bam_dir <arg>, --project <arg> \n\t\
 	Optional: --results_dir (default bam_dir), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam), --b37 (default hg38) \n\t\
 	Run like: \n\t\t\
-		sh ${PIPELINE_DIR}/submit_job.sh --variant_class --bam_dir /path/to/BAMs/ \n\n\
+		sh ${PIPELINE_DIR}/submit_job.sh --variant_class --bam_dir /path/to/BAMs/ --project Variant_Class_Analysis \n\n\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
