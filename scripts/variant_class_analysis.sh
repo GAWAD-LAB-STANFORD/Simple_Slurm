@@ -56,7 +56,7 @@ FILENAMES=()
 for SAMPLE in ${SAMPLE_ARRAY[@]}; do
 	FILENAMES+=( ${SAMPLE}.variant_class_counts.tsv )
 done
-head -n 1 ${FILENAMES[0]} | sed "s/^/SAMPLE\t/" > ${PROJECT}.merged_variant_class_counts.tsv
+head -n 1 ${FILENAMES[0]} | sed "s/^/sample\t/" > ${PROJECT}.merged_variant_class_counts.tsv
 for i in ${FILENAMES[@]}; do
 	SAMPLE=$(echo $i | sed "s/_variant_class_count.tsv//")
 	tail -n +2 $i | sed "s/^/${SAMPLE}\t/" >> ${PROJECT}.merged_variant_class_counts.tsv

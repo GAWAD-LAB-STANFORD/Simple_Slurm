@@ -54,7 +54,7 @@ echo "### Basic bcftools variant calling - START: $(date) ###"
 samtools mpileup -uf $REF_FASTA ${SAMPLE}${BAM_SUFFIX} | bcftools call -mv > ${RESULTS_DIR}/${SAMPLE}.pileup_calls.vcf
 echo "samtools mpileup and bcftools variant calling done"
 echo -e "count\tref\talt" > ${RESULTS_DIR}/${SAMPLE}.variant_class_counts.tsv
-cat ${RESULTS_DIR}/${SAMPLE}.pileup_calls.vcf | cut -f 4,5 | sort | uniq -c | sort -k1n \
+cat ${RESULTS_DIR}/${SAMPLE}.pileup_calls.vcf | cut -f 4,5 | sort | uniq -c | sort -k1n | \
 	sed 's/^[[:space:]]*//' | sed "s/ /$(printf '\t')/" >> ${RESULTS_DIR}/${SAMPLE}.variant_class_counts.tsv
 rm ${RESULTS_DIR}/${SAMPLE}.pileup_calls.vcf
 echo "variant class count done"
