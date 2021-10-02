@@ -54,16 +54,17 @@ export R_LIBS="/home/groups/cgawad/R_LIBS"
 echo "### Consolidating variant class counts - START: $(date) ###"
 FILENAMES=()
 for SAMPLE in ${SAMPLE_ARRAY[@]}; do
-	FILENAMES+=( ${SAMPLE}_variant_class_count.txt )
+	FILENAMES+=( ${SAMPLE}.variant_class_counts.tsv )
 done
-echo -e "sample\tchrM_proportion" > ${PROJECT}.merged_variant_class_counts.txt
+head -n 1 ${FILENAMES[0]} | sed "s/^/SAMPLE\t/" > ${PROJECT}.merged_variant_class_counts.tsv
 for i in ${FILENAMES[@]}; do
-	>> ${PROJECT}.merged_variant_class_counts.txt
+	SAMPLE=$(echo $i | sed "s/_variant_class_count.tsv//")
+	tail -n +2 $i | sed "s/^/${SAMPLE}\t/" >> ${PROJECT}.merged_variant_class_counts.tsv
 done 
 rm ${FILENAMES[@]}
 echo "### Consolidating variant class counts - END: $(date) ###"
 
 echo "### Plotting variant class counts - START: $(date) ###"
-Rscript ${SCRIPT_DIR}/variant_class_analysis.R ${PROJECT}.merged_variant_class_counts.txt $PROJECT
+Rscript ${SCRIPT_DIR}/variant_class_analysis.R ${PROJECT}.merged_variant_class_counts.tsv $PROJECT
 echo "### Plotting variant class counts - END: $(date) ###"
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
