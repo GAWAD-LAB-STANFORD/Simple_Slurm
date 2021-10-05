@@ -56,7 +56,7 @@ Tranche filter: \n\t\
         sh ${PIPELINE_DIR}/submit_job.sh --tranche_filter --vcf /path/to/my_variants.vcf.gz --tranche 99.0 \n\n\
 Scan2: \n\t\
     Required: --bam_dir <arg>, --project <arg> \n\t\
-    Optional: --results_dir (default bam_dir), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam), --b37 (default b37 but will be hg38 in the future) \n\t\
+    Optional: --results_dir (default bam_dir), --bulk (default T1200-1.bam), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam), --b37 (default b37 but will be hg38 in the future) \n\t\
     Run like: \n\t\t\
         sh ${PIPELINE_DIR}/submit_job.sh --scan2 --bam_dir /path/to/BAMs/ --project Scan2_Analysis \n\n\
 Variant Class: \n\t\
@@ -177,6 +177,9 @@ while [ "$1" != "" ]; do
                                 TRANCHE=$1
                                 ;;
         --exome )               EXOME=1
+                                ;;
+        --bulk )                shift
+                                BULK=1
                                 ;;
         --slurm )               shift
                                 SLURM_OPTIONS=${@:1}
@@ -535,6 +538,9 @@ elif [ $PROGRAM = "scan2" ]; then
     fi
     if [ ! -d $STD_ERR_OUT_DIR ]; then
         mkdir $STD_ERR_OUT_DIR
+    fi
+    if [ ! -z $BULK ]; then
+        OPTIONS+=( "--bulk $BULK" )
     fi
     SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
     JOB_COUNT=${#SAMPLE_ARRAY[@]}

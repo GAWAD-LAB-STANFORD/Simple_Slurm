@@ -40,7 +40,10 @@ while [ "$1" != "" ]; do
                             ;;
         --bam_suffix )      shift
                             BAM_SUFFIX=$1
-                            ;;                
+                            ;;
+        --bulk )            shift
+                            BULK=$1
+                            ;;                 
     esac
     shift
 done
@@ -61,11 +64,14 @@ fi
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi
+if [ ! -z $BULK ]; then
+    BULK=$GOLD_STANDARD
+fi
 SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
 SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
 SAMPLE_DIR="${RESULTS_DIR}/Scan2_Results_${SAMPLE}"
 echo -e "START: $(date)\nBam dir: $BAM_DIR\nBam regex: $BAM_REGEX\nBam suffix: $BAM_SUFFIX"
-echo -e "Genome version: $GENOME_VERSION\nResults dir: $RESULTS_DIR\nSample: $SAMPLE"
+echo -e "Genome version: $GENOME_VERSION\nResults dir: $RESULTS_DIR\nSample: $SAMPLE\nBulk: $BULK"
 
 source /home/groups/cgawad/miniconda3/etc/profile.d/conda.sh
 conda activate scan2
@@ -86,7 +92,7 @@ scan2 config \
 	--callable-regions True \
 	--score-all-sites \
 	--regions-file $REGIONS_BED \
-	--bulk-bam $GOLD_STANDARD \
+	--bulk-bam $BULK \
 	--sc-bam ${SAMPLE}${BAM_SUFFIX}
 echo "Scan2 configured"
 scan2 validate
