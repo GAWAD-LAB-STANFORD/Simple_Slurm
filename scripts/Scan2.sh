@@ -67,7 +67,8 @@ fi
 if [ ! -z $BULK ]; then
     BULK=$GOLD_STANDARD
 fi
-SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
+BULK_SAMPLE=$(basename $BULK | sed "s/${BAM_SUFFIX}//" | sed 's/.bqsr.marked.bam//' | sed 's/.bam//')
+SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//" | grep -v "$BULK_SAMPLE") )
 SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
 SAMPLE_DIR="${RESULTS_DIR}/Scan2_Results_${SAMPLE}"
 echo -e "START: $(date)\nBam dir: $BAM_DIR\nBam regex: $BAM_REGEX\nBam suffix: $BAM_SUFFIX"
