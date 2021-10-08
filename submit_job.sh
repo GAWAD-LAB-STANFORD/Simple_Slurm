@@ -548,7 +548,7 @@ elif [ $PROGRAM = "scan2" ]; then
         SCAN2_OPTIONS=( "--bulk $BULK" )
         BULK_SAMPLE=$(basename $BULK | sed "s/${BAM_SUFFIX}//" | sed 's/.bqsr.marked.bam//' | sed 's/.bam//')
         for SAMPLE in ${SAMPLE_ARRAY[@]}; do
-            if [ "$SAMPLE" != "$BULK_SAMPLE" ]; do
+            if [ "$SAMPLE" != "$BULK_SAMPLE" ]; then
                 SCAN2_ARRAY+=( "$SAMPLE" )
             fi
         done
