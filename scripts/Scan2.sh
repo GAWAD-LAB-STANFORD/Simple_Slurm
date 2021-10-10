@@ -64,7 +64,7 @@ fi
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi
-if [ ! -z $BULK ]; then
+if [ -z $BULK ]; then
     BULK=$GOLD_STANDARD
 fi
 BULK_SAMPLE=$(basename $BULK | sed "s/${BAM_SUFFIX}//" | sed 's/.bqsr.marked.bam//' | sed 's/.bam//')
