@@ -565,7 +565,7 @@ elif [ $PROGRAM = "scan2" ]; then
     JOB_COUNT=${#SCAN2_ARRAY[@]}
     sbatch -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
         --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/Scan2.sh \
-        --b37 --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $RESULTS_DIR \
+        --b37 --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $BAM_DIR \
         --bam_suffix $BAM_SUFFIX --project $PROJECT ${OPTIONS[@]}
 elif [ $PROGRAM = "variant_class" ]; then
 	if [ -z $BAM_DIR ] || [ -z $PROJECT ]; then
@@ -607,7 +607,7 @@ elif [ $PROGRAM = "variant_class" ]; then
 	sbatch --dependency=afterany:$DEPENDENCY \
 		-e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
         ${PIPELINE_DIR}/scripts/variant_class_analysis.sh \
-        --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $RESULTS_DIR \
+        --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $BAM_DIR \
 		--project $PROJECT ${OPTIONS[@]}
 elif [ $PROGRAM = "mosdepth" ]; then
 	if [ -z $BAM_DIR ]; then
@@ -642,7 +642,7 @@ elif [ $PROGRAM = "mosdepth" ]; then
     JOB_COUNT=${#SAMPLE_ARRAY[@]}
     sbatch --parsable -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
         --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/mosdepth.sh \
-        --bam_dir $RESULTS_DIR ${OPTIONS[@]}
+        --bam_dir $BAM_DIR ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0
