@@ -94,7 +94,7 @@ scan2 config \
 	--score-all-sites \
 	--regions-file $REGIONS_BED \
 	--bulk-bam $BULK \
-	--sc-bam ${SAMPLE}${BAM_SUFFIX}
+	--sc-bam ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX}
 echo "Scan2 configured"
 scan2 validate
 echo "Scan2 validated"
