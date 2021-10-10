@@ -186,7 +186,7 @@ while [ "$1" != "" ]; do
         --exome )               EXOME=1
                                 ;;
         --bulk )                shift
-                                BULK=1
+                                BULK=$1
                                 ;;
         --slurm )               shift
                                 SLURM_OPTIONS=${@:1}
