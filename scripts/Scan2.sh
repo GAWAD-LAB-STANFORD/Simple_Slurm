@@ -78,24 +78,30 @@ source /home/groups/cgawad/miniconda3/etc/profile.d/conda.sh
 conda activate scan2
 
 cd $RESULTS_DIR
-scan2 -d Scan2_Results_${SAMPLE} init
-cd Scan2_Results_${SAMPLE}
+if [ -d Scan2_Results_${SAMPLE} ]; then
+    echo "Folder exists, will validate and re-run any ended Scan2 processes with current configuration"
+    cd Scan2_Results_${SAMPLE}
+else
+    echo "Folder does not exist. Will create folder and configure for Scan2 running"
+    scan2 -d Scan2_Results_${SAMPLE} init
+    cd Scan2_Results_${SAMPLE}
 
-echo "### Running Scan2 ### - START: $(date)"
-scan2 config \
-	--verbose \
-	--ref $REF_FASTA \
-	--dbsnp $DBSNP_VCF \
-	--shapeit-refpanel $SHAPEIT_DIR \
-	--abmodel-chunks=4 \
-	--abmodel-samples-per-chunk=5000 \
-	--abmodel-steps=4 \
-	--callable-regions True \
-	--score-all-sites \
-	--regions-file $REGIONS_BED \
-	--bulk-bam $BULK \
-	--sc-bam ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX}
-echo "Scan2 configured"
+    echo "### Running Scan2 ### - START: $(date)"
+    scan2 config \
+        --verbose \
+        --ref $REF_FASTA \
+        --dbsnp $DBSNP_VCF \
+        --shapeit-refpanel $SHAPEIT_DIR \
+        --abmodel-chunks=4 \
+        --abmodel-samples-per-chunk=5000 \
+        --abmodel-steps=4 \
+        --callable-regions True \
+        --score-all-sites \
+        --regions-file $REGIONS_BED \
+        --bulk-bam $BULK \
+        --sc-bam ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX}
+    echo "Scan2 configured"
+fi
 scan2 validate
 echo "Scan2 validated"
 scan2 run --joblimit 300 --cluster 'sbatch -p cgawad --mem={resources.mem} -t 24:00:00 -o %logdir/slurm-%A.log' --snakemake-args ' --keep-going --max-status-checks-per-second 0.1'
@@ -103,14 +109,13 @@ echo "Scan2 ran"
 echo "### Running Scan2 ### - END: $(date)"
 
 echo "### Analyzing Scan2 mutational rates and true positives ### - START: $(date)"
-SET=$(echo $SAMPLE | sed "s/PGT_23366_/E/" | sed 's/Biopsy//' | sed 's/_S.*//')
 RDA="${SAMPLE_DIR}/snv/${SAMPLE}/somatic_genotypes.rda"
-Rscript germline_control.R $RDA somatic_${SAMPLE}.csv germline_${SAMPLE}.csv
+Rscript ${SCRIPT_DIR}/Scan2_germline_control.R $RDA somatic_${SAMPLE}.csv germline_${SAMPLE}.csv
 echo "True positive germline and somatic variants obtained"
 REGIONS="${SAMPLE_DIR}/callable_regions/${SAMPLE}/summary.chunk*.bulk_intersect.rda"
-Rscript get_callable_bases.R callable_${SAMPLE}.csv $REGIONS
+Rscript ${SCRIPT_DIR}/Scan2_get_callable_bases.R callable_${SAMPLE}.csv $REGIONS
 echo "Callable bases obtained"
-Rscript mutburden.R somatic_${SAMPLE}.csv germline_${SAMPLE}.csv callable_${SAMPLE}.csv burden_${SAMPLE}.csv
+Rscript ${SCRIPT_DIR}/Scan2_mutburden.R somatic_${SAMPLE}.csv germline_${SAMPLE}.csv callable_${SAMPLE}.csv burden_${SAMPLE}.csv
 echo "Mutation burden analyzed"
 head -n 1 germline_${SAMPLE}.csv | sed "s/chr/CHROM/" | sed "s/pos/POS/" | sed "s/refnt/REF/" | sed "s/altnt/ALT/" | tr ',' '\t' > ${RESULTS_DIR}/germline_${SAMPLE}.tsv
 tail -n +2 germline_${SAMPLE}.csv | tr ',' '\t' >> ${RESULTS_DIR}/germline_${SAMPLE}.tsv
