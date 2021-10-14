@@ -41,7 +41,7 @@ while [ "$1" != "" ]; do
 done
 
 if [ -z $PROJECT ]; then
-    PROJECT=$(basename $VCF | sed "s/.vcf.gz//" | sed "s/.merged//")
+    PROJECT=$(basename $VCF | sed 's/.vcf.gz//' | sed 's/.merged//')
 fi
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$(dirname $VCF)
