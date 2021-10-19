@@ -93,6 +93,7 @@ echo "### Reformatting into trinucleotide context ### - END: $(date)"
 echo "### Obtaining mutational signature with SigProfiler ### - START: $(date)"
 python3 -u ${SCRIPT_DIR}/SigProfiler_3_Extractor.py ${PROJECT}.sigprofiler_input.tsv \
     ${PROJECT}_SigProfiler_Results $RESULTS_DIR
+cp ${PROJECT}_SigProfiler_Results/SBS96/Suggested_Solution/COSMIC_SBS96_Decomposed_Solution/SBS96_Decomposition_Plots.pdf ${PROJECT}_SigProfiler_Results/${PROJECT}_SBS96_Decomposition_Plots.pdf
 echo "### Obtaining mutational signature with SigProfiler ### - END: $(date)"
 
 rm ${PROJECT}.temp_bedtools_reformat.tsv 
