@@ -8,6 +8,8 @@
 
 START_TIME=$(date +%s)
 MOSDEPTH="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools"
+BAM_REGEX=".*.bam"
+BAM_SUFFIX=".bam"
 
 GENOME_VERSION="hg38"
 MOSDEPTH_REF_DIR="/oak/stanford/groups/cgawad/Reference_Files/mosdepth_hg38"
