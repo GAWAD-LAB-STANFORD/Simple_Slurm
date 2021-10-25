@@ -94,6 +94,12 @@ cat ${SAMPLE}_pileup_calls.vcf | cut -f 4,5 | sort | uniq -c | sort -k1n | \
 rm ${SAMPLE}.pileup_calls.vcf
 echo "### Basic bcftools variant calling - END: $(date) ###"
 
+echo "### Counting BAM reads ### - START: $(date)"
+TOTAL_READS=$(samtools view -c ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX})
+MAPPED_READS=$(samtools view -c -F 260 ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX})
+echo -e "sample\ttotal_reads\tmapped_reads" > ${SAMPLE}.read_counts.tsv
+echo -e "$SAMPLE\t$TOTAL_READS\t$MAPPED_READS" >> ${SAMPLE}.read_counts.tsv
+echo "### Counting BAM reads ### - END: $(date)"
 
 echo "### Calculating QC metrics ### - START: $(date)"
 if [ $TARGETED -eq 1 ]; then
@@ -118,6 +124,11 @@ echo "CollectMultipleMetrics done"
 gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" CollectOxoGMetrics \
     -I ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} -O ${SAMPLE}.oxog_metrics.tsv -R $REF_FASTA \
     --VALIDATION_STRINGENCY LENIENT --INTERVALS $INTERVAL_LIST
+echo "CollectOxoGMetrics done"
+
+gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" CollectDuplicateMetrics \
+    -I ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} -O ${SAMPLE}.duplication_metrics.tsv -R $REF_FASTA \
+    --VALIDATION_STRINGENCY SILENT --MAX_RECORDS_IN_RAM 1000
 echo "CollectOxoGMetrics done"
 
 # cat <(samtools view -SH ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX}) <(samtools view -S ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} | shuf -n 5000000) | samtools view -b - > ${SAMPLE}${BAM_5M_SUFFIX}

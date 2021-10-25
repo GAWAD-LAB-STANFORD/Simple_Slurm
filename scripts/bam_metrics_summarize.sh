@@ -41,10 +41,10 @@ ml R/4.0.2 biology samtools
 export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 echo "### Summarizing metrics ### - START: $(date)"
-SAMPLE_READ_COUNTS="${PROJECT}.sample_read_counts.tsv"
 READ_COUNT_FILENAMES=( $(ls *.read_counts.tsv) )
-head -n 1 ${READ_COUNT_FILENAMES[0]} > $SAMPLE_READ_COUNTS
-for i in ${READ_COUNT_FILENAMES[@]}; do tail -n +2 $i; done >> $SAMPLE_READ_COUNTS
+head -n 1 ${READ_COUNT_FILENAMES[0]} > ${PROJECT}.merged_read_counts.tsv
+for i in ${READ_COUNT_FILENAMES[@]}; do tail -n +2 $i; done >> ${PROJECT}.merged_read_counts.tsv
+echo "Merged read counts"
 
 ALIGNMENT_METRICS_FILENAMES=( $(ls *.multiple_metrics.alignment_summary_metrics.tsv) )
 echo -e sample"\t"$(head -n 7 ${ALIGNMENT_METRICS_FILENAMES[0]} | tail -n 1) | sed 's/ /\t/g' > ${PROJECT}.merged_alignment_metrics.tsv
