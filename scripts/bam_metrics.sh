@@ -129,7 +129,7 @@ echo "CollectOxoGMetrics done"
 gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" CollectDuplicateMetrics \
     -I ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} -O ${SAMPLE}.duplication_metrics.tsv -R $REF_FASTA \
     --VALIDATION_STRINGENCY SILENT --MAX_RECORDS_IN_RAM 1000
-echo "CollectOxoGMetrics done"
+echo "CollectDuplicateMetrics done"
 
 # cat <(samtools view -SH ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX}) <(samtools view -S ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} | shuf -n 5000000) | samtools view -b - > ${SAMPLE}${BAM_5M_SUFFIX}
 BAM_5M_SUFFIX=$(echo $BAM_SUFFIX | sed "s/.bam/.5M.bam/")
