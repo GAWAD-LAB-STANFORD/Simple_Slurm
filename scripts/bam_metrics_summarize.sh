@@ -77,10 +77,10 @@ head -n 7 ${OXOG_METRICS_FILENAMES[0]} | tail -n 1 > ${PROJECT}.merged_oxog_metr
 for i in ${OXOG_METRICS_FILENAMES[@]}; do tail -n +8 $i | awk NF >> ${PROJECT}.merged_oxog_metrics.tsv; done
 echo "Merged oxog metrics"
 
-DUPLICATION_METRICS_FILENAMES=( $(ls *.duplication_metrics.tsv) )
-head -n 7 ${DUPLICATION_METRICS_FILENAMES[0]} | tail -n 1 > ${PROJECT}.merged_duplication_metrics.tsv
-for i in ${DUPLICATION_METRICS_FILENAMES[@]}; do head -n 8 $i | tail -n 1 >> ${PROJECT}.merged_duplication_metrics.tsv; done
-echo "Merged duplication metrics"
+# DUPLICATION_METRICS_FILENAMES=( $(ls *.duplication_metrics.tsv) )
+# head -n 7 ${DUPLICATION_METRICS_FILENAMES[0]} | tail -n 1 > ${PROJECT}.merged_duplication_metrics.tsv
+# for i in ${DUPLICATION_METRICS_FILENAMES[@]}; do head -n 8 $i | tail -n 1 >> ${PROJECT}.merged_duplication_metrics.tsv; done
+# echo "Merged duplication metrics"
 
 COVERAGE_FILENAMES=( $(ls *.wgs_coverage.tsv) )
 echo -e "sample\tchrM_proportion" > ${PROJECT}.merged_chrM_proportions.tsv

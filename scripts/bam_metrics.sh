@@ -20,6 +20,7 @@ PRESEQ_TOOL_DIR="${TOOLS_DIR}/preseq"
 CONSERTING_SC_TOOL_DIR="${TOOLS_DIR}/Conserting_SC"
 
 # hg38 reference files
+REFERENCE_DIR="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg38"
 REF_FASTA="${REFERENCE_DIR}/Homo_sapiens_assembly38.fasta"
 REF_GENOME="${REFERENCE_DIR}/Homo_sapiens_assembly38_bedtools.genome" # .genome or .fai file produced from samtools faidx function
 N25CHR_INTERVAL_LIST="${REFERENCE_DIR}/Homo_sapiens_assembly38_n25chr.interval_list"
@@ -64,6 +65,7 @@ export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 # hg19 version b37 reference files
 if [ "$GENOME_VERSION" = "b37" ]; then
+    REFERENCE_DIR="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_b37"
     REF_FASTA="${REFERENCE_DIR}/human_g1k_v37.fasta"
     REF_GENOME="${REFERENCE_DIR}/human_g1k_v37.genome"
     N25CHR_INTERVAL_LIST="${REFERENCE_DIR}/human_g1k_v37_n25chr.interval_list"
@@ -126,10 +128,11 @@ gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" Collect
     --VALIDATION_STRINGENCY LENIENT --INTERVALS $INTERVAL_LIST
 echo "CollectOxoGMetrics done"
 
-gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" CollectDuplicateMetrics \
-    -I ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} -O ${SAMPLE}.duplication_metrics.tsv -R $REF_FASTA \
-    --VALIDATION_STRINGENCY SILENT --MAX_RECORDS_IN_RAM 1000
-echo "CollectDuplicateMetrics done"
+# Not in GATK version 4.1.0.0 or 4.1.4.1, the versions currently available on Sherlock
+# gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" CollectDuplicateMetrics \
+#     -I ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} -O ${SAMPLE}.duplication_metrics.tsv -R $REF_FASTA \
+#     --VALIDATION_STRINGENCY SILENT --MAX_RECORDS_IN_RAM 1000
+# echo "CollectDuplicateMetrics done"
 
 # cat <(samtools view -SH ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX}) <(samtools view -S ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} | shuf -n 5000000) | samtools view -b - > ${SAMPLE}${BAM_5M_SUFFIX}
 BAM_5M_SUFFIX=$(echo $BAM_SUFFIX | sed "s/.bam/.5M.bam/")
