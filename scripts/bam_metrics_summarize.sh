@@ -29,7 +29,10 @@ while [ "$1" != "" ]; do
                             BAM_SUFFIX=$1
                             ;;
         --exome )           TARGETED=1
-                            ;;           
+                            ;;
+        --script_dir )      shift
+                            SCRIPT_DIR=$1
+                            ;;
     esac
     shift
 done
