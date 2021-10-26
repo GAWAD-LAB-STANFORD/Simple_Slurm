@@ -33,6 +33,9 @@ while [ "$1" != "" ]; do
         --script_dir )      shift
                             SCRIPT_DIR=$1
                             ;;
+        --project )         shift
+                            PROJECT=$1
+                            ;;
     esac
     shift
 done

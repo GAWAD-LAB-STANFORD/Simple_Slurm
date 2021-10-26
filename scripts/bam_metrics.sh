@@ -3,7 +3,7 @@
 #SBATCH --job-name=bam_metrics
 #SBATCH --cpus-per-task=4
 #SBATCH --nodes=1
-#SBATCH --time=1-00:00:00
+#SBATCH --time=4-00:00:00
 #SBATCH --partition=cgawad
 
 START_TIME=$(date +%s)
