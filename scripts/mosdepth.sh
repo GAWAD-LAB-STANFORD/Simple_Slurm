@@ -13,7 +13,7 @@ BAM_SUFFIX=".bam"
 
 GENOME_VERSION="hg38"
 MOSDEPTH_REF_DIR="/oak/stanford/groups/cgawad/Reference_Files/mosdepth_hg38"
-ECDNA="${MOSDEPTH_REF_DIR}/ecDNA_s.bed"
+ECDNA="${MOSDEPTH_REF_DIR}/ecDNA_2_sorted.bed"
 ENHANCERS="${MOSDEPTH_REF_DIR}/NA12878_enhancers_grch38_s.bed"
 XGEN_EXOME="${MOSDEPTH_REF_DIR}/xgen-exome-research-panel-targets_grch38_6col_s.bed"
 PROMOTERS="${MOSDEPTH_REF_DIR}/Promoters_GrCh38_s.bed"
