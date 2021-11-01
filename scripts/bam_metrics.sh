@@ -91,7 +91,7 @@ echo -e "Genome version: $GENOME_VERSION\nResults dir: $RESULTS_DIR\nSample: $SA
 echo "### Basic bcftools variant calling - START: $(date) ###"
 samtools mpileup -uf $REF_FASTA ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} | bcftools call -mv > ${SAMPLE}.pileup_calls.vcf
 echo -e "count\tref\talt" > ${SAMPLE}.variant_class_counts.tsv
-cat ${SAMPLE}_pileup_calls.vcf | cut -f 4,5 | sort | uniq -c | sort -k1n | \
+cat ${SAMPLE}.pileup_calls.vcf | cut -f 4,5 | sort | uniq -c | sort -k1n | \
     sed 's/^[[:space:]]*//' | sed "s/ /$(printf '\t')/" >> ${SAMPLE}.variant_class_counts.tsv
 rm ${SAMPLE}.pileup_calls.vcf
 echo "### Basic bcftools variant calling - END: $(date) ###"
