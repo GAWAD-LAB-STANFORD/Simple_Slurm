@@ -98,9 +98,7 @@ if [ $TARGETED -eq 1 ]; then
         --resource:1000G,known=false,training=true,truth=true,prior=10.0 $ONEKG_VCF \
         --resource:dbsnp,known=true,training=false,truth=false,prior=7.0 $DBSNP_VCF \
         -an QD -an FS -an SOR -an MQ -an MQRankSum -an ReadPosRankSum --mode SNP \
-        -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
-        -tranche 99.6 -tranche 99.5 -tranche 99.4 -tranche 99.3 \
-        -tranche 99.0 -tranche 98.0 -tranche 97.0 -tranche 90.0 -tranche $TRANCHE \
+        -tranche $TRANCHE \
         --max-gaussians 6 -R $REF_FASTA --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal_plots.R
     gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" VariantRecalibrator \
         -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal \
@@ -109,9 +107,7 @@ if [ $TARGETED -eq 1 ]; then
         --resource:axiomPoly,known=false,training=true,truth=false,prior=10 $AXIOM_VCF \
         --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
         -an QD -an FS -an SOR -an ReadPosRankSum -an MQRankSum --mode INDEL \
-        -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
-        -tranche 99.6 -tranche 99.5 -tranche 99.4 -tranche 99.3 \
-        -tranche 99.0 -tranche 98.0 -tranche 97.0 -tranche 90.0 -tranche $TRANCHE \
+        -tranche $TRANCHE \
         --max-gaussians 4 -R $REF_FASTA \
         --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal_plots.R
     echo "### Running VQSR on SNPs and Indels ### - END: $(date)"
@@ -125,9 +121,7 @@ else
         --resource:1000G,known=false,training=true,truth=true,prior=10.0 $ONEKG_VCF \
         --resource:dbsnp,known=true,training=false,truth=false,prior=7.0 $DBSNP_VCF \
         -an QD -an DP -an FS -an SOR -an MQ -an MQRankSum -an ReadPosRankSum --mode SNP \
-        -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
-        -tranche 99.6 -tranche 99.5 -tranche 99.4 -tranche 99.3 \
-        -tranche 99.0 -tranche 98.0 -tranche 97.0 -tranche 90.0 -tranche $TRANCHE \
+        -tranche $TRANCHE \
         --max-gaussians 6 -R $REF_FASTA --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.snp.recal_plots.R
     gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" VariantRecalibrator \
         -V ${PROJECT}.merged.vcf.gz -O ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal \
@@ -136,9 +130,7 @@ else
         --resource:axiomPoly,known=false,training=true,truth=false,prior=10 $AXIOM_VCF \
         --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $DBSNP_VCF \
         -an QD -an DP -an FS -an SOR -an ReadPosRankSum -an MQRankSum --mode INDEL \
-        -tranche 100.0 -tranche 99.95 -tranche 99.9 -tranche 99.8 \
-        -tranche 99.6 -tranche 99.5 -tranche 99.4 -tranche 99.3 \
-        -tranche 99.0 -tranche 98.0 -tranche 97.0 -tranche 90.0 -tranche $TRANCHE \
+        -tranche $TRANCHE \
         --max-gaussians 4 -R $REF_FASTA \
         --rscript-file ${PROJECT}.tranche_${TRANCHE}.merged.indel.recal_plots.R
     echo "### Running VQSR on SNPs and Indels ### - END: $(date)"
