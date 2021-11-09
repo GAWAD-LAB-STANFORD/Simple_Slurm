@@ -69,11 +69,16 @@ mosdepth: \n\t\
 	Optional: --results_dir (default bam_dir), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam) \n\t\
 	Run like: \n\t\t\
 		sh ${PIPELINE_DIR}/submit_job.sh --mosdepth --bam_dir /path/to/BAMs/ \n\n\
-bam_metrics: \n\t\
+Bam metrics: \n\t\
 	Required: --bam_dir <arg>, --project <arg> \n\t\
 	Optional: --results_dir (default bam_dir), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam), --exome \n\t\
 	Run like: \n\t\t\
 		sh ${PIPELINE_DIR}/submit_job.sh --bam_metrics --bam_dir /path/to/BAMs/ --project BAM_Metrics \n\n\
+Down sample: \n\t\
+	Required: --bam_dir <arg> \n\t\
+	Optional: --results_dir (default bam_dir), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam) \n\t\
+	Run like: \n\t\t\
+		sh ${PIPELINE_DIR}/submit_job.sh --down_sample --bam_dir /path/to/BAMs/ \n\n\
 For more information, read the README.md"
 
 # Reads in command line option arguments and assigns them to variables
@@ -115,6 +120,8 @@ while [ "$1" != "" ]; do
         --mosdepth )            PROGRAM="mosdepth"
                                 ;;
         --bam_metrics )         PROGRAM="bam_metrics"
+                                ;;
+        --down_sample )         PROGRAM="down_sample"
                                 ;;
         --kb_bin_size )         shift
                                 KB_BIN_SIZE=$1
@@ -693,6 +700,40 @@ elif [ $PROGRAM = "bam_metrics" ]; then
         --script_dir ${PIPELINE_DIR}/scripts/ \
         --results_dir $RESULTS_DIR \
 		--project $PROJECT ${OPTIONS[@]}
+elif [ $PROGRAM = "down_sample" ]; then
+	if [ -z $BAM_DIR ]; then
+        echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
+        exit 1
+    fi
+    if [ ! -z $BAM_SUFFIX ]; then
+        OPTIONS+=( "--bam_suffix $BAM_SUFFIX" )
+    else
+        BAM_SUFFIX=".bam"
+    fi
+    if [ ! -z $BAM_REGEX ]; then
+        OPTIONS+=( "--bam_regex $BAM_REGEX" )
+    else
+        BAM_REGEX=".*.bam"
+    fi
+    if [ ! -z $RESULTS_DIR ]; then
+        OPTIONS+=( "--results_dir $RESULTS_DIR" )
+    else
+        RESULTS_DIR=$BAM_DIR
+    fi
+    if [ ! -d $RESULTS_DIR ]; then
+        mkdir $RESULTS_DIR
+    fi
+    if [ -z $STD_ERR_OUT_DIR ]; then
+        STD_ERR_OUT_DIR="${RESULTS_DIR}/std_err_out_files"
+    fi
+    if [ ! -d $STD_ERR_OUT_DIR ]; then
+        mkdir $STD_ERR_OUT_DIR
+    fi
+    SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
+    JOB_COUNT=${#SAMPLE_ARRAY[@]}
+    sbatch --parsable -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
+        --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/down_sample.sh \
+        --bam_dir $BAM_DIR --results_dir $RESULTS_DIR ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0
