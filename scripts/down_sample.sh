@@ -40,7 +40,7 @@ BAM_5M_SUFFIX=$(echo $BAM_SUFFIX | sed "s/.bam/.5M.bam/")
 TOTAL_READS=$(samtools view -c ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX})
 FRACTION=$(awk -v y="$TOTAL_READS" 'BEGIN {printf "%3f", 5000000 / y}')
 if [ $TOTAL_READS -ge 5000000 ] && [ ! -z $FRACTION ]; then
-    gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=4 -Xmx63g" DownsampleSam \
+    gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=1 -Xmx16g" DownsampleSam \
         -I ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} -O ${SAMPLE}${BAM_5M_SUFFIX} \
         --PROBABILITY $FRACTION --VALIDATION_STRINGENCY SILENT
     echo "5M downsample done"
