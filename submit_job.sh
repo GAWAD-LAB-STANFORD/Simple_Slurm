@@ -734,7 +734,7 @@ elif [ $PROGRAM = "down_sample" ]; then
     fi
     SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
     JOB_COUNT=${#SAMPLE_ARRAY[@]}
-    sbatch --parsable -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
+    sbatch -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
         --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/down_sample.sh \
         --bam_dir $BAM_DIR --results_dir $RESULTS_DIR --mb_size $MB_SIZE ${OPTIONS[@]}
 else
