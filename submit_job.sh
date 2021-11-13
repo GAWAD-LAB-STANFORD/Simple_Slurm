@@ -75,7 +75,7 @@ Bam metrics: \n\t\
 	Run like: \n\t\t\
 		sh ${PIPELINE_DIR}/submit_job.sh --bam_metrics --bam_dir /path/to/BAMs/ --project BAM_Metrics \n\n\
 Down sample: \n\t\
-	Required: --bam_dir <arg> \n\t\
+	Required: --bam_dir <arg>, --mb_size <arg> \n\t\
 	Optional: --results_dir (default bam_dir), --bam_suffix <arg> (default .bam), --bam_regex <arg> (default .*.bam) \n\t\
 	Run like: \n\t\t\
 		sh ${PIPELINE_DIR}/submit_job.sh --down_sample --bam_dir /path/to/BAMs/ \n\n\
@@ -201,6 +201,9 @@ while [ "$1" != "" ]; do
                                 ;;
         --bulk )                shift
                                 BULK=$1
+                                ;;
+        --mb_size )             shift
+                                MB_SIZE=$1
                                 ;;
         --slurm )               shift
                                 SLURM_OPTIONS=${@:1}
@@ -701,7 +704,7 @@ elif [ $PROGRAM = "bam_metrics" ]; then
         --results_dir $RESULTS_DIR \
 		--project $PROJECT ${OPTIONS[@]}
 elif [ $PROGRAM = "down_sample" ]; then
-	if [ -z $BAM_DIR ]; then
+	if [ -z $BAM_DIR ] || [ -z $MB_SIZE ]; then
         echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
         exit 1
     fi
@@ -733,7 +736,7 @@ elif [ $PROGRAM = "down_sample" ]; then
     JOB_COUNT=${#SAMPLE_ARRAY[@]}
     sbatch --parsable -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
         --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/down_sample.sh \
-        --bam_dir $BAM_DIR --results_dir $RESULTS_DIR ${OPTIONS[@]}
+        --bam_dir $BAM_DIR --results_dir $RESULTS_DIR --mb_size $MB_SIZE ${OPTIONS[@]}
 else
     echo "No program specified. Exiting with code 0"
     exit 0

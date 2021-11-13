@@ -23,7 +23,10 @@ while [ "$1" != "" ]; do
                             ;;
         --bam_suffix )      shift
                             BAM_SUFFIX=$1
-                            ;;           
+                            ;;   
+        --mb_size )         shift
+                            MB_SIZE=$1
+                            ;;        
     esac
     shift
 done
@@ -39,13 +42,13 @@ echo -e "Results dir: $RESULTS_DIR\nSample: $SAMPLE"
 BAM_5M_SUFFIX=$(echo $BAM_SUFFIX | sed "s/.bam/.5M.bam/")
 TOTAL_READS=$(samtools view -c ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX})
 FRACTION=$(awk -v y="$TOTAL_READS" 'BEGIN {printf "%3f", 5000000 / y}')
-if [ $TOTAL_READS -ge 5000000 ] && [ ! -z $FRACTION ]; then
+if [ $TOTAL_READS -ge ${MB_SIZE}000000 ] && [ ! -z $FRACTION ]; then
     gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=1 -Xmx16g" DownsampleSam \
         -I ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} -O ${SAMPLE}${BAM_5M_SUFFIX} \
         --PROBABILITY $FRACTION --VALIDATION_STRINGENCY SILENT
-    echo "5M downsample done"
+    echo "${MB_SIZE}M downsample done"
     samtools index ${SAMPLE}${BAM_5M_SUFFIX}
 else
-    echo "Bam is less than 5 million reads, cannot downsample"
+    echo "Bam is less than ${MB_SIZE} million reads, cannot downsample"
 fi
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
