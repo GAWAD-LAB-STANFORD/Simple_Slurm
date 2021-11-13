@@ -39,7 +39,7 @@ SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
 echo -e "START: $(date)\nBam dir: $BAM_DIR\nBam regex: $BAM_REGEX\nBam suffix: $BAM_SUFFIX"
 echo -e "Results dir: $RESULTS_DIR\nSample: $SAMPLE"
 
-BAM_5M_SUFFIX=$(echo $BAM_SUFFIX | sed "s/.bam/.5M.bam/")
+BAM_5M_SUFFIX=$(echo $BAM_SUFFIX | sed "s/.bam/.${MB_SIZE}M.bam/")
 TOTAL_READS=$(samtools view -c ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX})
 FRACTION=$(awk -v y="$TOTAL_READS" 'BEGIN {printf "%3f", 5000000 / y}')
 if [ $TOTAL_READS -ge ${MB_SIZE}000000 ] && [ ! -z $FRACTION ]; then
