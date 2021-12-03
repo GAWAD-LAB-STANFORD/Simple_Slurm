@@ -432,8 +432,7 @@ elif [ $PROGRAM = "circle_map" ]; then
     fi
     if [ ! -z $RESULTS_DIR ]; then
         OPTIONS+=( "--results_dir $RESULTS_DIR" )
-    fi
-    if [ -z $RESULTS_DIR ]; then
+    else
         RESULTS_DIR=$BAM_DIR
     fi
     if [ ! -d $RESULTS_DIR ]; then
@@ -604,6 +603,8 @@ elif [ $PROGRAM = "variant_class" ]; then
     fi
     if [ ! -z $RESULTS_DIR ]; then
         OPTIONS+=( "--results_dir $RESULTS_DIR" )
+    else
+        RESULTS_DIR=$BAM_DIR
     fi
     if [ ! -d $RESULTS_DIR ]; then
         mkdir $RESULTS_DIR
@@ -618,7 +619,7 @@ elif [ $PROGRAM = "variant_class" ]; then
     JOB_COUNT=${#SAMPLE_ARRAY[@]}
     DEPENDENCY=$(sbatch --parsable -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
         --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/variant_class.sh \
-        --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $RESULTS_DIR ${OPTIONS[@]})
+        --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $BAM_DIR ${OPTIONS[@]})
 	sbatch --dependency=afterany:$DEPENDENCY \
 		-e $STD_ERR_OUT_DIR/%A_%x.err -o $STD_ERR_OUT_DIR/%A_%x.out \
         ${PIPELINE_DIR}/scripts/variant_class_analysis.sh \
@@ -641,6 +642,8 @@ elif [ $PROGRAM = "mosdepth" ]; then
     fi
     if [ ! -z $RESULTS_DIR ]; then
         OPTIONS+=( "--results_dir $RESULTS_DIR" )
+    else
+        RESULTS_DIR=$BAM_DIR
     fi
     if [ ! -d $RESULTS_DIR ]; then
         mkdir $RESULTS_DIR
