@@ -42,7 +42,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-echo -e "START: $(date)\nBam dir: ${BAM_DIR}\nResults dir: $RESULTS_DIR\nBam regex: ${BAM_REGEX}\nBam suffix: ${BAM_SUFFIX}\nKb bin size: $KB_BIN_SIZE"
+echo -e "START: $(date)\nBam dir: ${BAM_DIR}\nResults dir: $RESULTS_DIR\nBam regex: ${BAM_REGEX}\nBam suffix: ${BAM_SUFFIX}\nKb bin size: $KB_BIN_SIZE\nFull work dir: $FULL_WORK_DIR"
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR
 fi
