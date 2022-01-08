@@ -110,6 +110,10 @@ echo "### Running Scan2 ### - END: $(date)"
 
 echo "### Analyzing Scan2 mutational rates and true positives ### - START: $(date)"
 RDA="${SAMPLE_DIR}/snv/${SAMPLE}/somatic_genotypes.rda"
+if [ ! -f $RDA ]; then
+    echo "RDA file does not exist. Exiting with code 1"
+    exit 1
+fi
 Rscript ${SCRIPT_DIR}/Scan2_germline_control.R $RDA somatic_${SAMPLE}.csv germline_${SAMPLE}.csv
 echo "True positive germline and somatic variants obtained"
 REGIONS="${SAMPLE_DIR}/callable_regions/${SAMPLE}/summary.chunk*.bulk_intersect.rda"
@@ -127,16 +131,16 @@ echo "Somatic true positives formatted for SigProfiler script"
 # rm -r Scan2_Results_${SAMPLE}
 echo "### Analyzing Scan2 mutational rates and true positives ### - END: $(date)"
 
-echo "### Computing mutational signature with SigProfiler ### - START: $(date)"
-srun ${SCRIPT_DIR}/SigProfiler.sh --project $PROJECT \
-    --script_dir $SCRIPT_DIR --results_dir $RESULTS_DIR \
-    --tsv germline_${SAMPLE}.tsv \
-    ${OPTIONS[@]}
-echo "Germline true positives mutational signatures done"
-srun ${SCRIPT_DIR}/SigProfiler.sh --project $PROJECT \
-    --script_dir $SCRIPT_DIR --results_dir $RESULTS_DIR \
-    --tsv somatic_${SAMPLE}.tsv \
-    ${OPTIONS[@]}
-echo "Somatic true positives mutational signatures done"
-echo "### Computing mutational signature with SigProfiler ### - END: $(date)"
+# echo "### Computing mutational signature with SigProfiler ### - START: $(date)"
+# srun ${SCRIPT_DIR}/SigProfiler.sh --project $PROJECT \
+#     --script_dir $SCRIPT_DIR --results_dir $RESULTS_DIR \
+#     --tsv germline_${SAMPLE}.tsv \
+#     ${OPTIONS[@]}
+# echo "Germline true positives mutational signatures done"
+# srun ${SCRIPT_DIR}/SigProfiler.sh --project $PROJECT \
+#     --script_dir $SCRIPT_DIR --results_dir $RESULTS_DIR \
+#     --tsv somatic_${SAMPLE}.tsv \
+#     ${OPTIONS[@]}
+# echo "Somatic true positives mutational signatures done"
+# echo "### Computing mutational signature with SigProfiler ### - END: $(date)"
 echo -e "END: $(date)\nRuntime: $(($(date +%s)-$START_TIME)) seconds"
