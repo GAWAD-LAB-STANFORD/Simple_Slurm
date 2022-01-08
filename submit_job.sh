@@ -564,21 +564,12 @@ elif [ $PROGRAM = "scan2" ]; then
     fi
     if [ ! -z $BULK ]; then
         OPTIONS+=( "--bulk $BULK" )
-    fi
-    SCAN2_ARRAY=()
-    SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
-    if [ ! -z $BULK ]; then
-        SCAN2_OPTIONS=( "--bulk $BULK" )
         BULK_SAMPLE=$(basename $BULK | sed "s/${BAM_SUFFIX}//" | sed 's/.bqsr.marked.bam//' | sed 's/.bam//')
-        for SAMPLE in ${SAMPLE_ARRAY[@]}; do
-            if [ "$SAMPLE" != "$BULK_SAMPLE" ]; then
-                SCAN2_ARRAY+=( "$SAMPLE" )
-            fi
-        done
+        SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//" | grep -v "$BULK_SAMPLE") )
     else
-        SCAN2_ARRAY=("${SAMPLE_ARRAY[@]}")
+        SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
     fi
-    JOB_COUNT=${#SCAN2_ARRAY[@]}
+    JOB_COUNT=${#SAMPLE_ARRAY[@]}
     sbatch -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
         --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/Scan2.sh \
         --b37 --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $BAM_DIR \
