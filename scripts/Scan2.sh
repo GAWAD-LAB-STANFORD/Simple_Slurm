@@ -27,7 +27,8 @@ while [ "$1" != "" ]; do
         --results_dir )     shift
                             RESULTS_DIR=$1
                             ;;
-        --b37 )             GENOME_VERSION="b37"
+        --genome_version )  shift
+                            GENOME_VERSION=$1
                             ;;
         --script_dir )      shift
                             SCRIPT_DIR=$1
@@ -43,7 +44,10 @@ while [ "$1" != "" ]; do
                             ;;
         --bulk )            shift
                             BULK=$1
-                            ;;                 
+                            ;;       
+        --std_err_out )     shift
+                            STD_ERR_OUT_DIR=$1
+                            ;;
     esac
     shift
 done
@@ -73,6 +77,15 @@ SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
 SAMPLE_DIR="${RESULTS_DIR}/Scan2_Results_${SAMPLE}"
 echo -e "START: $(date)\nBam dir: $BAM_DIR\nBam regex: $BAM_REGEX\nBam suffix: $BAM_SUFFIX"
 echo -e "Genome version: $GENOME_VERSION\nResults dir: $RESULTS_DIR\nSample: $SAMPLE\nBulk: $BULK"
+
+echo "For re-running this job:"
+echo "sbatch --dependency=afterany:${SLURM_JOB_ID} \
+    -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
+    --array=1-${JOB_COUNT} ${SCRIPT_DIR}/Scan2.sh \
+    --script_dir $SCRIPT_DIR --bam_dir $BAM_DIR \
+    --bam_suffix $BAM_SUFFIX --bam_regex $BAM_REGEX \
+    --project $PROJECT --bulk $BULK --genome_version $GENOME_VERSION  \
+    --std_err_out $STD_ERR_OUT_DIR --results_dir $RESULTS_DIR"
 
 source /home/groups/cgawad/miniconda3/etc/profile.d/conda.sh
 conda activate scan2
@@ -104,7 +117,7 @@ else
 fi
 scan2 validate
 echo "Scan2 validated"
-scan2 run --joblimit 300 --cluster 'sbatch -p cgawad --mem={resources.mem} -t 24:00:00 -o %logdir/slurm-%A.log' --snakemake-args ' --keep-going --max-status-checks-per-second 0.1'
+scan2 run --joblimit 95 --cluster 'sbatch -p cgawad --mem=16G -t 24:00:00 -o %logdir/slurm-%A.log' --snakemake-args ' --keep-going --max-status-checks-per-second 0.1'
 echo "Scan2 ran"
 echo "### Running Scan2 ### - END: $(date)"
 

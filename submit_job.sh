@@ -534,23 +534,21 @@ elif [ $PROGRAM = "scan2" ]; then
         echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
         exit 1
     fi
-    if [ ! -z $BAM_SUFFIX ]; then
-        OPTIONS+=( "--bam_suffix $BAM_SUFFIX" )
-    else
+    GENOME_VERSION="b37"
+    if [ -z $BAM_SUFFIX ]; then
         BAM_SUFFIX=".bam"
     fi
-    if [ ! -z $BAM_REGEX ]; then
-        OPTIONS+=( "--bam_regex $BAM_REGEX" )
-    else
+    if [ -z $BAM_REGEX ]; then
         BAM_REGEX=".*.bam"
     fi
-    GENOME_VERSION="b37"
-    if [ $GENOME_VERSION = "b37" ]; then
-        OPTIONS+=( "--b37" )
+    if [ -z $BULK ]; then
+        if [ $GENOME_VERSION = "b37" ]; then
+            BULK="/oak/stanford/groups/cgawad/Wet_Lab_Tech_Development/R2D2_First_PTA_Paper/PTA_MDA_LIANTI_Comparison/PTA_WGA_WGS_BAMS/T1200-1.bam"
+        else
+            BULK="/oak/stanford/groups/cgawad/Wet_Lab_Tech_Development/R2D2_First_PTA_Paper/PTA_MDA_LIANTI_Comparison/PTA_WGA_WGS_BAMS/T1200-1.bam"
+        fi
     fi
-    if [ ! -z $RESULTS_DIR ]; then
-        OPTIONS+=( "--results_dir $RESULTS_DIR" )
-    else
+    if [ -z $RESULTS_DIR ]; then
         RESULTS_DIR=$BAM_DIR
     fi
     if [ ! -d $RESULTS_DIR ]; then
@@ -572,8 +570,10 @@ elif [ $PROGRAM = "scan2" ]; then
     JOB_COUNT=${#SAMPLE_ARRAY[@]}
     sbatch -e $STD_ERR_OUT_DIR/%A_%a_%x.err -o $STD_ERR_OUT_DIR/%A_%a_%x.out \
         --array=1-${JOB_COUNT} ${PIPELINE_DIR}/scripts/Scan2.sh \
-        --b37 --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $BAM_DIR \
-        --bam_suffix $BAM_SUFFIX --project $PROJECT ${OPTIONS[@]}
+        --script_dir ${PIPELINE_DIR}/scripts/ --bam_dir $BAM_DIR \
+        --bam_suffix $BAM_SUFFIX --bam_regex $BAM_REGEX \
+        --project $PROJECT --bulk $BULK --genome_version $GENOME_VERSION \
+        --std_err_out $STD_ERR_OUT_DIR --results_dir $RESULTS_DIR
 elif [ $PROGRAM = "variant_class" ]; then
 	if [ -z $BAM_DIR ] || [ -z $PROJECT ]; then
         echo "Variables not supplied correctly or bam_dir doesn't exist. Use -h/--help options for assistance. Exiting with code 1"
