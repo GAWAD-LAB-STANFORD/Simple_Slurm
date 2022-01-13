@@ -10,6 +10,7 @@ START_TIME=$(date +%s)
 TOOLS_DIR="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/"
 BAM_REGEX=".*.bam"
 BAM_SUFFIX=".bam"
+MORE_MEM=0
 
 GENOME_VERSION="hg38"
 REFERENCE_DIR="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg38"
@@ -117,7 +118,7 @@ else
 fi
 scan2 validate
 echo "Scan2 validated"
-scan2 run --joblimit 95 --cluster 'sbatch -p cgawad --mem=16G -t 24:00:00 -o %logdir/slurm-%A.log' --snakemake-args ' --keep-going --max-status-checks-per-second 0.1'
+scan2 run --joblimit 95 --cluster 'sbatch -p cgawad --cpus-per-task=1 -t 24:00:00 -o %logdir/slurm-%A.log' --snakemake-args ' --keep-going --max-status-checks-per-second 0.1'
 echo "Scan2 ran"
 echo "### Running Scan2 ### - END: $(date)"
 
