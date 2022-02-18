@@ -10,7 +10,7 @@ START_TIME=$(date +%s)
 TOOLS_DIR="/oak/stanford/groups/cgawad/Sequencing_Analysis_Tools/"
 BAM_REGEX=".*.bam"
 BAM_SUFFIX=".bam"
-MORE_MEM=0
+GB=0
 
 GENOME_VERSION="hg38"
 REFERENCE_DIR="/oak/stanford/groups/cgawad/Reference_Files/GATK_Resource_Bundle_hg38"
@@ -49,6 +49,8 @@ while [ "$1" != "" ]; do
         --std_err_out )     shift
                             STD_ERR_OUT_DIR=$1
                             ;;
+        --gb )              shift
+                            GB=$1
     esac
     shift
 done
@@ -86,7 +88,7 @@ echo "sbatch --dependency=afterany:${SLURM_JOB_ID} \
     --script_dir $SCRIPT_DIR --bam_dir $BAM_DIR \
     --bam_suffix $BAM_SUFFIX --bam_regex $BAM_REGEX \
     --project $PROJECT --bulk $BULK --genome_version $GENOME_VERSION  \
-    --std_err_out $STD_ERR_OUT_DIR --results_dir $RESULTS_DIR"
+    --std_err_out $STD_ERR_OUT_DIR --results_dir $RESULTS_DIR --gb 16"
 
 source /home/groups/cgawad/miniconda3/etc/profile.d/conda.sh
 conda activate scan2
@@ -118,7 +120,11 @@ else
 fi
 scan2 validate
 echo "Scan2 validated"
-scan2 run --joblimit 95 --cluster 'sbatch -p cgawad --cpus-per-task=1 -t 24:00:00 -o %logdir/slurm-%A.log' --snakemake-args ' --keep-going --max-status-checks-per-second 0.1'
+if [ $GB -eq 0 ]; then
+    scan2 run --joblimit 95 --cluster 'sbatch -p cgawad --mem={resources.mem} -t 24:00:00 -o %logdir/slurm-%A.log' --snakemake-args ' --keep-going --max-status-checks-per-second 0.1'
+else
+        scan2 run --joblimit 95 --cluster 'sbatch -p cgawad' "--mem=${GB}G" '-t 24:00:00 -o %logdir/slurm-%A.log' --snakemake-args ' --keep-going --max-status-checks-per-second 0.1'
+fi
 echo "Scan2 ran"
 echo "### Running Scan2 ### - END: $(date)"
 
