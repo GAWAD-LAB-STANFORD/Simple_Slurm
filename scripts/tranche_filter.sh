@@ -52,7 +52,7 @@ if [ TARGETED -eq 1 ]; then
 fi
 cd $RESULTS_DIR
 
-ml R/4.0.2 java perl biology gatk bedtools samtools
+ml R/4.2.0 java perl biology gatk bedtools samtools
 export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 ml python/3.6.1

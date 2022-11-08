@@ -48,7 +48,7 @@ fi
 echo -e "Bam suffix: $BAM_SUFFIX\nKb bin size: $KB_BIN_SIZE\nResults dir: $RESULTS_DIR"
 cd $BAM_DIR
 
-ml R/4.0.2
+ml R/4.2.0
 export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | \

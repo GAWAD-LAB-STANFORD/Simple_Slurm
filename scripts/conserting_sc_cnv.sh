@@ -32,7 +32,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-ml perl R/4.0.2 biology samtools bedtools
+ml perl R/4.2.0 biology samtools bedtools
 export R_LIBS="/home/groups/cgawad/R_LIBS"
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$BAM_DIR

@@ -48,7 +48,7 @@ echo -e "START: $(date)\nBam dir: $BAM_DIR\nBam regex: $BAM_REGEX\nBam suffix: $
 echo -e "Genome version: $GENOME_VERSION\nResults dir: $RESULTS_DIR\nSample: $SAMPLE"
 
 cd $RESULTS_DIR
-ml R/4.0.2
+ml R/4.2.0
 export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 echo "### Consolidating variant class counts - START: $(date) ###"

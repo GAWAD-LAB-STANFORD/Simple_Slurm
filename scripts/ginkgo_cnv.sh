@@ -51,7 +51,7 @@ if [ ! -d $FULL_WORK_DIR ]; then
 fi
 cd $GINKGO_DIR
 
-ml php R/4.0.2 biology bedtools samtools
+ml php R/4.2.0 biology bedtools samtools
 export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )

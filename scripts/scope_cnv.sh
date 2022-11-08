@@ -41,7 +41,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-ml R/4.0.2
+ml R/4.2.0
 export R_LIBS="/home/groups/cgawad/R_LIBS"
 if [ -z $RESULTS_DIR ]; then
     RESULTS_DIR=$EXPERIMENTAL_DIR
