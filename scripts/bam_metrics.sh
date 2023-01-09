@@ -60,7 +60,7 @@ while [ "$1" != "" ]; do
 done
 
 cd $RESULTS_DIR
-ml R/4.2.0 java gsl biology samtools bedtools gatk bcftools
+ml R/4.2.0 java/11.0.11 gsl biology samtools bedtools gatk bcftools
 export R_LIBS="/home/groups/cgawad/R_LIBS"
 
 # hg19 version b37 reference files

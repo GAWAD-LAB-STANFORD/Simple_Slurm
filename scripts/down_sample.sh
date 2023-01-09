@@ -32,7 +32,7 @@ while [ "$1" != "" ]; do
 done
 
 cd $RESULTS_DIR
-ml java gsl biology samtools gatk
+ml java/11.0.11 gsl biology samtools gatk
 
 SAMPLE_ARRAY=( $(find ${BAM_DIR} -maxdepth 1 -regextype sed -regex ".*${BAM_REGEX}" -exec basename {} \; | sed "s/${BAM_SUFFIX}//") )
 SAMPLE=${SAMPLE_ARRAY[$(( $SLURM_ARRAY_TASK_ID - 1 ))]}
