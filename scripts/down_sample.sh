@@ -41,7 +41,8 @@ echo -e "Results dir: $RESULTS_DIR\nSample: $SAMPLE"
 
 BAM_5M_SUFFIX=$(echo $BAM_SUFFIX | sed "s/.bam/.${MB_SIZE}M.bam/")
 TOTAL_READS=$(samtools view -c ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX})
-FRACTION=$(awk -v y="$TOTAL_READS" 'BEGIN {printf "%3f", 5000000 / y}')
+FULL_SIZE=${MB_SIZE}000000
+FRACTION=$(awk -v x="$FULL_SIZE" y="$TOTAL_READS" 'BEGIN {printf "%3f", x / y}')
 if [ $TOTAL_READS -ge ${MB_SIZE}000000 ] && [ ! -z $FRACTION ]; then
     gatk --java-options "-XX:+UseParallelGC -XX:ParallelGCThreads=1 -Xmx16g" DownsampleSam \
         -I ${BAM_DIR}/${SAMPLE}${BAM_SUFFIX} -O ${SAMPLE}${BAM_5M_SUFFIX} \
